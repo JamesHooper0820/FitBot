@@ -5,9 +5,6 @@ import os
 import requests
 import json
 import random as r
-from bot.logger import create_logger
-
-logger = create_logger(__name__)
 
 bot = Bot(command_prefix="!")
 
@@ -32,6 +29,7 @@ async def quote(ctx):
     quote = await get_quote()
     await ctx.send(ctx.author.mention + ' ' + quote)
 
+# WIP
 @bot.command(pass_context=True)
 async def initialize(ctx):
     channel = ctx.message.channel
@@ -49,7 +47,7 @@ async def initialize(ctx):
 
     await client.send_message(channel, embed=embed)
 
-### WIP
+# WIP
 @bot.command()
 async def posture(ctx):
     user_id_list = [243348545585938433]

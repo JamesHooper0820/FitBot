@@ -1,7 +1,7 @@
 import json
 from discord.ext.commands import Bot
 
-def get_prefix(client, message) -> str:
+def get_prefix(message) -> str:
     with open("prefixes.json", "r") as f:
         prefixes = json.load(f)
 
