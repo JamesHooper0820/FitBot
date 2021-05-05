@@ -33,7 +33,7 @@ def create_logger(logger_name: str) -> logging.Logger:
 
     formatter = CustomFormatter()
 
-    file_handler = logging.FileHandler(os.path.join(logging.BASE_DIR, 'fitbot.log'))
+    file_handler = logging.FileHandler(os.path.join('logs/', 'fitbot.log'))
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)

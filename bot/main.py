@@ -33,7 +33,7 @@ async def quote(ctx):
     await ctx.send(ctx.author.mention + ' ' + quote)
 
 @bot.command(pass_context=True)
-async def intialize(ctx):
+async def initialize(ctx):
     channel = ctx.message.channel
     embed = discord.Embed(
         title = "Title",
