@@ -45,7 +45,7 @@ async def initialize(ctx):
     embed.add_field(name="test", value="test value", inline=False)
     embed.add_field(name="test", value="test value", inline=False)
 
-    await client.send_message(channel, embed=embed)
+    await bot.send_message(channel, embed=embed)
 
 # WIP
 @bot.command()
