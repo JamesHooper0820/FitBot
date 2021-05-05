@@ -5,7 +5,7 @@ import requests
 import json
 import random as r
 
-bot = Bot(command_prefix="!")
+bot = Bot(command_prefix='!')
 
 @bot.event
 async def on_ready():
