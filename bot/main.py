@@ -9,18 +9,18 @@ bot = Bot(command_prefix='!')
 
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user}.')
+    print(f"Logged in as {bot.user}.")
     await status()
 
 async def status():
-    activity = discord.Activity(name='your health!', type=discord.ActivityType.watching)
+    activity = discord.Activity(name="your health!", type=discord.ActivityType.watching)
     await bot.change_presence(activity=activity)
 
 @bot.event
 async def get_quote():
-    response = requests.get('https://type.fit/api/quotes')
+    response = requests.get("https://type.fit/api/quotes")
     json_data = json.loads(response.text)
-    random_quote = json_data[r.randint(0, len(json_data))]['text'] + " - " + json_data[r.randint(0, len(json_data))]['author']
+    random_quote = json_data[r.randint(0, len(json_data))]["text"] + " - " + json_data[r.randint(0, len(json_data))]["author"]
     return random_quote
 
 @bot.command()
@@ -34,7 +34,7 @@ async def posture(ctx):
     user_id_list = [243348545585938433]
     for user_id in user_id_list:
         user = await bot.get_user_info(user_id)
-        await user.send(user.mention + 'Posture check!')
+        await user.send(user.mention + "Posture check!")
 
 @bot.event
 async def on_raw_reaction_add(payload):
@@ -45,7 +45,7 @@ async def on_raw_reaction_add(payload):
         guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds) 
 
         if payload.emoji.name == '🧍':
-            role = discord.utils.get(guild.roles, name='Posture Check') 
+            role = discord.utils.get(guild.roles, name="Posture Check") 
 
         if role is not None: # If role exists
             member = await guild.fetch_member(payload.user_id)
@@ -65,7 +65,7 @@ async def on_raw_reaction_remove(payload):
         guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
 
         if payload.emoji.name == '🧍':
-            role = discord.utils.get(guild.roles, name='Posture Check')
+            role = discord.utils.get(guild.roles, name="Posture Check")
 
         if role is not None:
             member = await guild.fetch_member(payload.user_id)
@@ -76,4 +76,4 @@ async def on_raw_reaction_remove(payload):
         else:
             print("Role not found")
 
-bot.run(os.getenv('TOKEN'))
+bot.run(os.getenv("TOKEN"))
