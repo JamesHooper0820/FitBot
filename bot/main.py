@@ -1,5 +1,4 @@
 import discord
-from discord import client
 from discord.ext.commands import Bot
 import os
 import requests
@@ -45,7 +44,7 @@ async def initialize(ctx):
     embed.add_field(name="test", value="test value", inline=False)
     embed.add_field(name="test", value="test value", inline=False)
 
-    await bot.send_message(channel, embed=embed)
+    await ctx.send(channel, embed=embed)
 
 # WIP
 @bot.command()
