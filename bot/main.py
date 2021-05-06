@@ -1,6 +1,7 @@
+from aiohttp.helpers import TimerContext
 import discord
 from discord.ext.commands import Bot
-from discord.ext import tasks
+from discord.ext.tasks import loop
 import os
 import requests
 import json
@@ -15,10 +16,11 @@ async def status():
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}.")
+    posture.start()
     await status()
 
 @bot.event
-async def on_guild_join(guild: discord.Guild):
+async def on_guild_join(guild):
 	await guild.create_role(name="Posture Check", mentionable=True, colour=discord.Colour.blue)
 
 @bot.event
@@ -33,14 +35,15 @@ async def quote(ctx):
     quote = await get_quote()
     await ctx.send(ctx.author.mention + ' ' + quote)
 
-@tasks.loop(seconds=60)
-async def posture(guild: discord.Guild, role: discord.Role):
-    role = discord.utils.get(guild.roles, name="Posture Check")
-    if role is None:
-        return
-    for member in guild.members:
-        if role in member.roles:
-            await bot.send_message(member, member.mention + "Hourly posture check, fix your posture!")
+# WIP
+@loop(seconds=3.0)
+async def posture():
+    guilds = await bot.fetch_guilds().flatten()
+    for guild in guilds:
+        role = discord.utils.get(guild.roles, name="Posture Check")
+        members = [m for m in guild.members if role in m.roles]
+        for m in members:
+            await m.send((m.mention + "Hourly posture check, fix your posture!"))
 
 @bot.command(aliases=["createrole"])
 async def create_role(ctx, *, name):
