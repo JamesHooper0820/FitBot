@@ -29,13 +29,26 @@ async def quote(ctx):
     await ctx.send(ctx.author.mention + ' ' + quote)
 
 # WIP
+@bot.command()
+async def posture(ctx):
+    user_id_list = [243348545585938433]
+    for user_id in user_id_list:
+        user = await bot.get_user_info(user_id)
+        await user.send(user.mention + "Posture check!")
+
+# WIP
+@bot.command()
+async def create_role(ctx, *, name):
+	guild = ctx.guild
+	await guild.create_role(name=name)
+	await ctx.send(f"Role `{name}` has been created.")
+
+# WIP
 @bot.command(pass_context=True)
 async def initialize(ctx):
-    channel = ctx.message.channel
     embed = discord.Embed(
         title = "Introducing FitBot!",
-        description = """FitBot is a fitness, health and well-being discord bot designed
-        to enhance and encourage people to take care of their physical and mental health.""",
+        description = "FitBot is a fitness, health and well-being discord bot designed to enhance and encourage people to take care of their physical and mental health.",
         colour = discord.Color.blue()
     )
 
@@ -46,24 +59,16 @@ async def initialize(ctx):
     embed.add_field(name="test", value="test value", inline=False)
     embed.add_field(name="test", value="test value", inline=False)
 
-    await ctx.send(channel, embed=embed)
-
-# WIP
-@bot.command()
-async def posture(ctx):
-    user_id_list = [243348545585938433]
-    for user_id in user_id_list:
-        user = await bot.get_user_info(user_id)
-        await user.send(user.mention + "Posture check!")
+    initial_message = await ctx.send(embed=embed)
+    await initial_message.add_reaction("🧍")
 
 @bot.event
 async def on_raw_reaction_add(payload):
     message_id = payload.message_id
-    channel = bot.get_channel(payload.channel_id)
-    msg = await channel.fetch_message(payload.message_id)
-    embed = msg.embeds[0]
+    msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
+    msg_id = msg.id
 
-    if message_id == embed:
+    if message_id == msg_id:
         guild_id = payload.guild_id 
         guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
 
@@ -72,8 +77,9 @@ async def on_raw_reaction_add(payload):
         
         if role is not None: # If role exists
             member = await guild.fetch_member(payload.user_id)
-            if member is not None: 
-                await member.add_roles(role) 
+            if member != bot.user:
+                if member is not None: 
+                    await member.add_roles(role)
             else:
                 print("Member not found")
         else:
@@ -82,11 +88,10 @@ async def on_raw_reaction_add(payload):
 @bot.event
 async def on_raw_reaction_remove(payload):
     message_id = payload.message_id
-    channel = bot.get_channel(payload.channel_id)
-    msg = await channel.fetch_message(payload.message_id)
-    embed = msg.embeds[0]
+    msg = await bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
+    msg_id = msg.id
 
-    if message_id == embed:
+    if message_id == msg_id:
         guild_id = payload.guild_id 
         guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
 
@@ -95,8 +100,9 @@ async def on_raw_reaction_remove(payload):
         
         if role is not None: # If role exists
             member = await guild.fetch_member(payload.user_id)
-            if member is not None: 
-                await member.remove_roles(role) 
+            if member != bot.user:
+                if member is not None: 
+                    await member.remove_roles(role) 
             else:
                 print("Member not found")
         else:
