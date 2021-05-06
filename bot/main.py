@@ -33,12 +33,14 @@ async def quote(ctx):
 async def initialize(ctx):
     channel = ctx.message.channel
     embed = discord.Embed(
-        title = "Title",
-        description = "Description",
+        title = "Introducing FitBot!",
+        description = """FitBot is a fitness, health and well-being discord bot designed
+        to enhance and encourage people to take care of their physical and mental health.""",
         colour = discord.Color.blue()
     )
 
     embed.set_footer(text="Footer")
+    embed.set_image(url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
     embed.set_thumbnail(url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
     embed.set_author(name="FitBot", icon_url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
     embed.add_field(name="test", value="test value", inline=False)
@@ -57,14 +59,17 @@ async def posture(ctx):
 @bot.event
 async def on_raw_reaction_add(payload):
     message_id = payload.message_id
+    channel = bot.get_channel(payload.channel_id)
+    msg = await channel.fetch_message(payload.message_id)
+    embed = msg.embeds[0]
 
-    if message_id == 839555899504590868: 
+    if message_id == embed:
         guild_id = payload.guild_id 
-        guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds) 
+        guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
 
         if payload.emoji.name == '🧍':
             role = discord.utils.get(guild.roles, name="Posture Check") 
-
+        
         if role is not None: # If role exists
             member = await guild.fetch_member(payload.user_id)
             if member is not None: 
@@ -77,18 +82,21 @@ async def on_raw_reaction_add(payload):
 @bot.event
 async def on_raw_reaction_remove(payload):
     message_id = payload.message_id
-  
-    if message_id == 839555899504590868:
-        guild_id = payload.guild_id
+    channel = bot.get_channel(payload.channel_id)
+    msg = await channel.fetch_message(payload.message_id)
+    embed = msg.embeds[0]
+
+    if message_id == embed:
+        guild_id = payload.guild_id 
         guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
 
         if payload.emoji.name == '🧍':
-            role = discord.utils.get(guild.roles, name="Posture Check")
-
-        if role is not None:
+            role = discord.utils.get(guild.roles, name="Posture Check") 
+        
+        if role is not None: # If role exists
             member = await guild.fetch_member(payload.user_id)
-            if member is not None:
-                await member.remove_roles(role)
+            if member is not None: 
+                await member.remove_roles(role) 
             else:
                 print("Member not found")
         else:
