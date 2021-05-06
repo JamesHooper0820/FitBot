@@ -42,7 +42,7 @@ async def posture(guild: discord.Guild, role: discord.Role):
         if role in member.roles:
             await bot.send_message(member, member.mention + "Hourly posture check, fix your posture!")
 
-@bot.command(aliases="createrole")
+@bot.command(aliases=["createrole"])
 async def create_role(ctx, *, name):
 	guild = ctx.guild
 	await guild.create_role(name=name)
