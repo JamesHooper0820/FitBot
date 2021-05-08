@@ -23,11 +23,6 @@ async def on_ready():
     await status()
 
 @bot.event
-async def on_guild_join(guild):
-    await guild.create_role(name="Posture Check", mentionable=True, colour=discord.Colour.green)
-    await guild.create_role(name="Hydration Check", mentionable=True, colour=discord.Colour.blue)
-
-@bot.event
 async def get_quote() -> str:
     response = requests.get("https://type.fit/api/quotes")
     json_data = json.loads(response.text)
@@ -63,6 +58,9 @@ async def create_role(ctx, *, name):
 
 @bot.command(pass_context=True)
 async def initialize(ctx):
+    await ctx.guild.create_role(name="Posture Check", mentionable=True, colour=discord.Colour.green)
+    await ctx.guild.create_role(name="Hydration Check", mentionable=True, colour=discord.Colour.blue)
+
     embed = discord.Embed(
         title = "Introducing FitBot!",
         description = "FitBot is a fitness, health and well-being discord bot designed to enhance and encourage people to take care of their physical and mental health.",
@@ -73,7 +71,7 @@ async def initialize(ctx):
     embed.set_image(url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
     embed.set_thumbnail(url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
     embed.set_author(name="FitBot", icon_url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
-    embed.add_field(name="Reactions", value="Click on the reactions to this message in order to access roles.", inline=False)
+    embed.add_field(name="Reactions", value="Click on the reactions to this message in order to access roles:", inline=False)
     embed.add_field(name=":person_standing:", value="Posture Checker Role", inline=False)
     embed.add_field(name=":potable_water:", value="Hydration Checker Role", inline=False)
 
