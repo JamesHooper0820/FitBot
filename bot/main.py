@@ -72,8 +72,8 @@ async def initialize(ctx):
     embed.set_thumbnail(url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
     embed.set_author(name="FitBot", icon_url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
     embed.add_field(name="Reactions", value="Click on the reactions to this message in order to access roles:", inline=False)
-    embed.add_field(name=":person_standing:", value="Posture Checker Role", inline=False)
-    embed.add_field(name=":potable_water:", value="Hydration Checker Role", inline=False)
+    embed.add_field(name="🧍", value="Posture Checker Role", inline=False)
+    embed.add_field(name="🚰", value="Hydration Checker Role", inline=False)
 
     initial_message = await ctx.send(embed=embed)
     await initial_message.add_reaction("🧍")
@@ -89,14 +89,14 @@ async def on_raw_reaction_add(payload):
         guild_id = payload.guild_id 
         guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
 
-        if payload.emoji.name == ':person_standing:':
+        if payload.emoji.name == '🧍':
             role = discord.utils.get(guild.roles, name="Posture Check")
             if role is not None:
                 member = await guild.fetch_member(payload.user_id)
                 if member != bot.user:
                     if member is not None: 
                         await member.add_roles(role) 
-        if payload.emoji.name == ':potable_water:':
+        if payload.emoji.name == '🚰':
             role = discord.utils.get(guild.roles, name="Hydration Check") 
             if role is not None:
                 member = await guild.fetch_member(payload.user_id)
@@ -114,14 +114,14 @@ async def on_raw_reaction_remove(payload):
         guild_id = payload.guild_id 
         guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
 
-        if payload.emoji.name == ':person_standing:':
+        if payload.emoji.name == '🧍':
             role = discord.utils.get(guild.roles, name="Posture Check") 
             if role is not None:
                 member = await guild.fetch_member(payload.user_id)
                 if member != bot.user:
                     if member is not None: 
                         await member.remove_roles(role) 
-        if payload.emoji.name == ':potable_water:':
+        if payload.emoji.name == '🚰':
             role = discord.utils.get(guild.roles, name="Hydration Check")
             if role is not None:
                 member = await guild.fetch_member(payload.user_id)
