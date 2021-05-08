@@ -19,11 +19,13 @@ async def status():
 async def on_ready():
     print(f"Logged in as {bot.user}.")
     posture.start()
+    hydration.start()
     await status()
 
 @bot.event
 async def on_guild_join(guild):
-	await guild.create_role(name="Posture Check", mentionable=True, colour=discord.Colour.blue)
+    await guild.create_role(name="Posture Check", mentionable=True, colour=discord.Colour.green)
+    await guild.create_role(name="Hydration Check", mentionable=True, colour=discord.Colour.blue)
 
 @bot.event
 async def get_quote() -> str:
@@ -45,6 +47,14 @@ async def posture():
         for m in members:
             await m.send((m.mention + " Hourly posture check, fix your posture!"))
 
+@loop(hours=1)
+async def hydration():
+    for guild in bot.guilds:
+        role = discord.utils.find(lambda r: r.name == 'Hydration Check', guild.roles)
+        members = [m for m in guild.members if role in m.roles]
+        for m in members:
+            await m.send((m.mention + " Hourly hydration check, drink some water!"))
+
 @bot.command(aliases=["createrole"])
 async def create_role(ctx, *, name):
 	guild = ctx.guild
@@ -64,10 +74,12 @@ async def initialize(ctx):
     embed.set_thumbnail(url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
     embed.set_author(name="FitBot", icon_url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
     embed.add_field(name="Reactions", value="Click on the reactions to this message in order to access roles.", inline=False)
-    embed.add_field(name="🧍", value="Posture Checker Role", inline=False)
+    embed.add_field(name=":person_standing:", value="Posture Checker Role", inline=False)
+    embed.add_field(name=":potable_water:", value="Hydration Checker Role", inline=False)
 
     initial_message = await ctx.send(embed=embed)
-    await initial_message.add_reaction("🧍")
+    await initial_message.add_reaction(":person_standing:")
+    await initial_message.add_reaction(":potable_water:")
 
 @bot.event
 async def on_raw_reaction_add(payload):
@@ -78,18 +90,21 @@ async def on_raw_reaction_add(payload):
     if message_id == msg_id:
         guild_id = payload.guild_id 
         guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
-        if payload.emoji.name == '🧍':
-            role = discord.utils.get(guild.roles, name="Posture Check") 
-        
-        if role is not None: # If role exists
-            member = await guild.fetch_member(payload.user_id)
-            if member != bot.user:
-                if member is not None: 
-                    await member.add_roles(role)
-            else:
-                print("Member not found")
-        else:
-            print("Role not found")
+
+        if payload.emoji.name == ':person_standing:':
+            role = discord.utils.get(guild.roles, name="Posture Check")
+            if role is not None:
+                member = await guild.fetch_member(payload.user_id)
+                if member != bot.user:
+                    if member is not None: 
+                        await member.add_roles(role) 
+        if payload.emoji.name == ':potable_water:':
+            role = discord.utils.get(guild.roles, name="Hydration Check") 
+            if role is not None:
+                member = await guild.fetch_member(payload.user_id)
+                if member != bot.user:
+                    if member is not None: 
+                        await member.add_roles(role)
 
 @bot.event
 async def on_raw_reaction_remove(payload):
@@ -101,17 +116,19 @@ async def on_raw_reaction_remove(payload):
         guild_id = payload.guild_id 
         guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
 
-        if payload.emoji.name == '🧍':
+        if payload.emoji.name == ':person_standing:':
             role = discord.utils.get(guild.roles, name="Posture Check") 
-        
-        if role is not None:
-            member = await guild.fetch_member(payload.user_id)
-            if member != bot.user:
-                if member is not None: 
-                    await member.remove_roles(role) 
-            else:
-                print("Member not found")
-        else:
-            print("Role not found")
+            if role is not None:
+                member = await guild.fetch_member(payload.user_id)
+                if member != bot.user:
+                    if member is not None: 
+                        await member.remove_roles(role) 
+        if payload.emoji.name == ':potable_water:':
+            role = discord.utils.get(guild.roles, name="Hydration Check")
+            if role is not None:
+                member = await guild.fetch_member(payload.user_id)
+                if member != bot.user:
+                    if member is not None: 
+                        await member.remove_roles(role) 
 
 bot.run(os.getenv("TOKEN"))
