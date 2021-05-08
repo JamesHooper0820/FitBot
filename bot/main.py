@@ -1,4 +1,3 @@
-from aiohttp.helpers import TimerContext
 import discord
 from discord.ext.commands import Bot
 from discord.ext.tasks import loop
@@ -7,7 +6,10 @@ import requests
 import json
 import random as r
 
-bot = Bot(command_prefix="!")
+intents = discord.Intents.default()
+intents.members = True
+
+bot = Bot(command_prefix="!", intents=intents)
 
 async def status():
     activity = discord.Activity(name="your health!", type=discord.ActivityType.watching)
@@ -35,15 +37,13 @@ async def quote(ctx):
     quote = await get_quote()
     await ctx.send(ctx.author.mention + ' ' + quote)
 
-# WIP
-@loop(seconds=3.0)
+@loop(hours=1)
 async def posture():
-    guilds = await bot.fetch_guilds().flatten()
-    for guild in guilds:
-        role = discord.utils.get(guild.roles, name="Posture Check")
+    for guild in bot.guilds:
+        role = discord.utils.find(lambda r: r.name == 'Posture Check', guild.roles)
         members = [m for m in guild.members if role in m.roles]
         for m in members:
-            await m.send((m.mention + "Hourly posture check, fix your posture!"))
+            await m.send((m.mention + " Hourly posture check, fix your posture!"))
 
 @bot.command(aliases=["createrole"])
 async def create_role(ctx, *, name):
@@ -78,7 +78,6 @@ async def on_raw_reaction_add(payload):
     if message_id == msg_id:
         guild_id = payload.guild_id 
         guild = discord.utils.find(lambda g : g.id == guild_id, bot.guilds)
-
         if payload.emoji.name == '🧍':
             role = discord.utils.get(guild.roles, name="Posture Check") 
         
@@ -105,7 +104,7 @@ async def on_raw_reaction_remove(payload):
         if payload.emoji.name == '🧍':
             role = discord.utils.get(guild.roles, name="Posture Check") 
         
-        if role is not None: # If role exists
+        if role is not None:
             member = await guild.fetch_member(payload.user_id)
             if member != bot.user:
                 if member is not None: 
