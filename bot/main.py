@@ -76,8 +76,8 @@ async def initialize(ctx):
     embed.add_field(name=":potable_water:", value="Hydration Checker Role", inline=False)
 
     initial_message = await ctx.send(embed=embed)
-    await initial_message.add_reaction(":person_standing:")
-    await initial_message.add_reaction(":potable_water:")
+    await initial_message.add_reaction("🧍")
+    await initial_message.add_reaction("🚰")
 
 @bot.event
 async def on_raw_reaction_add(payload):
