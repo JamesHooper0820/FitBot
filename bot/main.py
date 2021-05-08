@@ -58,8 +58,8 @@ async def create_role(ctx, *, name):
 
 @bot.command(pass_context=True)
 async def initialize(ctx):
-    await ctx.guild.create_role(name="Posture Check", mentionable=True, colour=discord.Colour.green)
-    await ctx.guild.create_role(name="Hydration Check", mentionable=True, colour=discord.Colour.blue)
+    await ctx.guild.create_role(name="Posture Check", mentionable=True, colour=discord.Colour(0x34e12f))
+    await ctx.guild.create_role(name="Hydration Check", mentionable=True, colour=discord.Colour(0x45c7ea))
 
     embed = discord.Embed(
         title = "Introducing FitBot!",
