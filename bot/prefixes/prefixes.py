@@ -39,4 +39,4 @@ async def changeprefix(ctx, prefix):
     with open("prefixes.json", "w") as f:
         json.dump(prefixes, f, indent=4)
 
-    await ctx.send(f"Command prefix changed to: {prefix}")
+    await ctx.send(f"Command prefix changed to: `{prefix}`")
