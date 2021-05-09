@@ -16,7 +16,7 @@ class Core(commands.Cog):
         intents = discord.Intents.default()
         intents.members = True
 
-        bot = Bot(command_prefix="!", intents=intents, help_command=None)
+        bot = Bot(command_prefix="!", intents=intents)
         
         total_members = sum([len(guild.members) for guild in self.bot.guilds])
 
@@ -162,4 +162,4 @@ class Core(commands.Cog):
                             await member.remove_roles(role) 
 
 def setup(bot):
-        bot.add_cog(Core(bot))
+    bot.add_cog(Core(bot))
