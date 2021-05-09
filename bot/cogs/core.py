@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from discord.ext.commands import Bot
 from discord.ext.tasks import loop
+from discord.raw_models import RawReactionActionEvent
 import requests
 import json
 import random as r
@@ -13,22 +13,17 @@ class Core(commands.Cog):
         """Initialize the bot."""
         self.bot = bot
 
-        intents = discord.Intents.default()
-        intents.members = True
-
-        bot = Bot(command_prefix="!", intents=intents)
-        
-        total_members = sum([len(guild.members) for guild in self.bot.guilds])
-
+        self.sum = 0
         self.activities_index = 0
         self.activities = [
-            discord.Activity(name=str(total_members) + " hearts", type=discord.ActivityType.watching),
+            discord.Activity(name=str(self.sum) + " hearts", type=discord.ActivityType.watching),
             discord.Activity(name="your health", type=discord.ActivityType.watching)
         ]
 
-    @loop(seconds=5)
-    async def statuses(self):
+    @loop(seconds=10)
+    async def statuses(self) -> None:
         """Loop different bot statuses."""
+        self.activities[0].name = str(self.sum) + " hearts"
 
         await self.bot.change_presence(activity=self.activities[self.activities_index])
         self.activities_index += 1
@@ -36,17 +31,16 @@ class Core(commands.Cog):
             self.activities_index = 0
 
     @commands.Cog.listener()
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         print(f"Logged in as {self.bot.user}.")
+
+        for guild in self.bot.guilds:
+            members = await guild.fetch_members(limit=None).flatten()
+            self.sum += len(members)
 
         self.posture.start()
         self.hydration.start()
-        await self.statuses()
-
-    @commands.Cog.listener()
-    async def on_guild_join(self):
-        role = discord.utils.find(lambda r: r.name == 'FitBot', self.guild.roles)
-        role.hoist = True
+        self.statuses.start()
 
     @commands.Cog.listener()
     async def get_quote(self) -> str:
@@ -56,12 +50,12 @@ class Core(commands.Cog):
         return random_quote
 
     @commands.command(pass_context=True)
-    async def quote(self, ctx):
+    async def quote(self, ctx) -> None:
         quote = await self.get_quote()
         await ctx.send(ctx.author.mention + ' ' + quote)
 
     @loop(hours=1)
-    async def posture(self):
+    async def posture(self) -> None:
         for self.guild in self.bot.guilds:
             role = discord.utils.find(lambda r: r.name == 'Posture Check', self.guild.roles)
             members = [m for m in self.guild.members if role in m.roles]
@@ -72,7 +66,7 @@ class Core(commands.Cog):
                     pass
 
     @loop(hours=1)
-    async def hydration(self):
+    async def hydration(self) -> None:
         for self.guild in self.bot.guilds:
             role = discord.utils.find(lambda r: r.name == 'Hydration Check', self.guild.roles)
             members = [m for m in self.guild.members if role in m.roles]
@@ -82,14 +76,14 @@ class Core(commands.Cog):
                 except discord.Forbidden:
                     pass
 
-    @commands.command(aliases=["createrole"])
-    async def create_role(self, ctx, *, name):
+    @commands.command(pass_context=True, aliases=["createrole"])
+    async def create_role(self, ctx, *, name) -> None:
         guild = ctx.guild
         await guild.create_role(name=name)
         await ctx.send(f"Role `{name}` has been created.")
 
     @commands.command(pass_context=True)
-    async def initialize(ctx):
+    async def initialize(self, ctx) -> None:
         await ctx.guild.create_role(name="Posture Check", mentionable=True, colour=discord.Colour(0x34e12f))
         await ctx.guild.create_role(name="Hydration Check", mentionable=True, colour=discord.Colour(0x45c7ea))
 
@@ -111,52 +105,56 @@ class Core(commands.Cog):
         await initial_message.add_reaction("🧍")
         await initial_message.add_reaction("🚰")
 
-    @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload):
-        message_id = payload.message_id
-        msg = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
-        msg_id = msg.id
+    async def get_message_from_payload(self, bot: commands.Bot, payload: discord.RawReactionActionEvent, user: discord.User) -> discord.Message:
+        """Return a message object from a given reaction payload."""
+        channel = await bot.fetch_channel(bot, payload.channel_id)
+        assert isinstance(channel, discord.abc.Messageable)
 
-        if message_id == msg_id:
-            guild_id = payload.guild_id 
-            guild = discord.utils.find(lambda g : g.id == guild_id, self.bot.guilds)
+        if channel is None:
+            # Handle DM channels
+            if user.dm_channel is None:
+                dm_channel = await user.create_dm()
+                if dm_channel.id == payload.channel_id:
+                    channel = dm_channel
+            else:
+                raise ValueError('Payload channel not found')
 
-            if payload.emoji.name == '🧍':
-                role = discord.utils.get(self.guild.roles, name="Posture Check")
-                if role is not None:
-                    member = await self.guild.fetch_member(payload.user_id)
-                    if member != self.bot.user:
-                        if member is not None: 
-                            await member.add_roles(role) 
-            if payload.emoji.name == '🚰':
-                role = discord.utils.get(self.guild.roles, name="Hydration Check") 
-                if role is not None:
-                    member = await self.guild.fetch_member(payload.user_id)
-                    if member != self.bot.user:
-                        if member is not None: 
-                            await member.add_roles(role)
+        return await channel.fetch_message(payload.message_id)
 
     @commands.Cog.listener()
-    async def on_raw_reaction_remove(self, payload):
-        message_id = payload.message_id
-        msg = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
-        msg_id = msg.id
+    async def on_raw_reaction_add(self, payload: RawReactionActionEvent) -> None:
+        if payload.user_id == self.bot.user.id:
+            return
+        emoji = payload.emoji.name
 
-        if message_id == msg_id:
-            guild_id = payload.guild_id 
-            guild = discord.utils.find(lambda g : g.id == guild_id, self.bot.guilds)
+        if emoji == '🧍':
+            role = discord.utils.get(self.guild.roles, name="Posture Check")
+            if role is not None:
+                member = await self.guild.fetch_member(payload.user_id)
+                if member is not None: 
+                    await member.add_roles(role) 
+        if emoji == '🚰':
+            role = discord.utils.get(self.guild.roles, name="Hydration Check") 
+            if role is not None:
+                member = await self.guild.fetch_member(payload.user_id)
+                if member is not None: 
+                    await member.add_roles(role)
 
-            if payload.emoji.name == '🧍':
-                role = discord.utils.get(self.guild.roles, name="Posture Check") 
-                if role is not None:
-                    member = await self.guild.fetch_member(payload.user_id)
-                    if member != self.bot.user:
-                        if member is not None: 
-                            await member.remove_roles(role) 
-            if payload.emoji.name == '🚰':
-                role = discord.utils.get(self.guild.roles, name="Hydration Check")
-                if role is not None:
-                    member = await self.guild.fetch_member(payload.user_id)
-                    if member != self.bot.user:
-                        if member is not None: 
-                            await member.remove_roles(role) 
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, payload: RawReactionActionEvent) -> None:
+        if payload.user_id == self.bot.user.id:
+            return
+        emoji = payload.emoji.name
+
+        if emoji == '🧍':
+            role = discord.utils.get(self.guild.roles, name="Posture Check") 
+            if role is not None:
+                member = await self.guild.fetch_member(payload.user_id)
+                if member is not None: 
+                    await member.remove_roles(role) 
+        if emoji == '🚰':
+            role = discord.utils.get(self.guild.roles, name="Hydration Check")
+            if role is not None:
+                member = await self.guild.fetch_member(payload.user_id)
+                if member is not None: 
+                    await member.remove_roles(role) 

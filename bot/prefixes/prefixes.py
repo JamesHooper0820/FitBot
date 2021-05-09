@@ -1,42 +1,43 @@
 import json
-from discord.ext.commands import Bot
+from discord.ext import commands
 
-def get_prefix(message) -> str:
-    with open("prefixes.json", "r") as f:
+async def get_prefix(_, message) -> str:
+    with open("bot/prefixes/prefixes.json", "r") as f:
         prefixes = json.load(f)
 
-    return prefixes[str(message.guild.id)]
+    return prefixes.get(str(message.guild.id), "!")
 
-bot = Bot(command_prefix = get_prefix)
+class Prefixes(commands.Cog):
+    """Initialize the prefixes cog."""
 
-@bot.event
-async def on_guild_join(guild):
-    with open("prefixes.json", "r") as f:
-        prefixes = json.load(f)
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        with open("bot/prefixes/prefixes.json", "r") as f:
+            prefixes = json.load(f)
 
-    prefixes[str(guild.id)] = "!"
+        prefixes[str(guild.id)] = "!"
 
-    with open("prefixes.json", "w") as f:
-        json.dump(prefixes, f, indent=4)
+        with open("bot/prefixes/prefixes.json", "w") as f:
+            json.dump(prefixes, f, indent=4)
 
-@bot.event
-async def on_guild_remove(guild):
-    with open("prefixes.json", "r") as f:
-        prefixes = json.load(f)
+    @commands.Cog.listener()
+    async def on_guild_remove(self, guild):
+        with open("bot/prefixes/prefixes.json", "r") as f:
+            prefixes = json.load(f)
 
-    prefixes.pop(str(guild.id))
+        prefixes.pop(str(guild.id))
 
-    with open("prefixes.json", "w") as f:
-        json.dump(prefixes, f, indent=4)
+        with open("bot/prefixes/prefixes.json", "w") as f:
+            json.dump(prefixes, f, indent=4)
 
-@bot.command
-async def changeprefix(ctx, prefix):
-    with open("prefixes.json", "r") as f:
-        prefixes = json.load(f)
+    @commands.command()
+    async def changeprefix(self, ctx, prefix):
+        with open("bot/prefixes/prefixes.json", "r") as f:
+            prefixes = json.load(f)
 
-    prefixes[str(ctx.guild.id)] = prefix
+        prefixes[str(ctx.guild.id)] = prefix
 
-    with open("prefixes.json", "w") as f:
-        json.dump(prefixes, f, indent=4)
+        with open("bot/prefixes/prefixes.json", "w") as f:
+            json.dump(prefixes, f, indent=4)
 
-    await ctx.send(f"Command prefix changed to: `{prefix}`")
+        await ctx.send(f"Command prefix changed to: `{prefix}`")
