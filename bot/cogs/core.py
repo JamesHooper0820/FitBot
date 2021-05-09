@@ -22,7 +22,7 @@ class Core(commands.Cog):
 
         self.activities_index = 0
         self.activities = [
-            discord.Activity(name=total_members + " hearts", type=discord.ActivityType.watching),
+            discord.Activity(name=str(total_members) + " hearts", type=discord.ActivityType.watching),
             discord.Activity(name="your health", type=discord.ActivityType.watching)
         ]
 
@@ -31,7 +31,7 @@ class Core(commands.Cog):
         """Loop different bot statuses."""
 
         await self.bot.change_presence(activity=self.activities[self.activities_index])
-        self.activity_index += 1
+        self.activities_index += 1
         if self.activities_index >= len(self.activities):
             self.activities_index = 0
 
@@ -41,7 +41,7 @@ class Core(commands.Cog):
 
         self.posture.start()
         self.hydration.start()
-        await self.status()
+        await self.statuses()
 
     @commands.Cog.listener()
     async def on_guild_join(self):
@@ -160,6 +160,3 @@ class Core(commands.Cog):
                     if member != self.bot.user:
                         if member is not None: 
                             await member.remove_roles(role) 
-
-def setup(bot):
-    bot.add_cog(Core(bot))
