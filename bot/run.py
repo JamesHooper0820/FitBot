@@ -20,3 +20,6 @@ class Run(commands.Cog):
         for filename in os.listdir("./cogs"):
             if filename.endswith(".py"):
                 self.bot.load_extension(f"cogs.{filename[:-3]}")
+
+    runbot()
+    autoload()
