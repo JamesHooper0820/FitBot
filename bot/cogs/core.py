@@ -126,6 +126,8 @@ class Core(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: RawReactionActionEvent) -> None:
+        print(self.initialize_id)
+        print(payload.message_id)
         if payload.message_id != self.initialize_id:
             return
         if payload.user_id == self.bot.user.id:
