@@ -14,6 +14,7 @@ class Core(commands.Cog):
         self.bot = bot
 
         self.sum = 0
+        self.initialize_id = 0
         self.activities_index = 0
         self.activities = [
             discord.Activity(name=str(self.sum) + " hearts", type=discord.ActivityType.watching),
@@ -105,13 +106,15 @@ class Core(commands.Cog):
         await initial_message.add_reaction("🧍")
         await initial_message.add_reaction("🚰")
 
+        self.initialize_id = initial_message.id
+
+    # WIP - Understand
     async def get_message_from_payload(self, bot: commands.Bot, payload: discord.RawReactionActionEvent, user: discord.User) -> discord.Message:
         """Return a message object from a given reaction payload."""
         channel = await bot.fetch_channel(bot, payload.channel_id)
         assert isinstance(channel, discord.abc.Messageable)
 
         if channel is None:
-            # Handle DM channels
             if user.dm_channel is None:
                 dm_channel = await user.create_dm()
                 if dm_channel.id == payload.channel_id:
@@ -123,6 +126,8 @@ class Core(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: RawReactionActionEvent) -> None:
+        if payload.message_id != self.initialize_id:
+            return
         if payload.user_id == self.bot.user.id:
             return
         emoji = payload.emoji.name
@@ -142,6 +147,8 @@ class Core(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload: RawReactionActionEvent) -> None:
+        if payload.message_id != self.initialize_id:
+            return
         if payload.user_id == self.bot.user.id:
             return
         emoji = payload.emoji.name
