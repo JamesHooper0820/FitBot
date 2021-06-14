@@ -1,4 +1,4 @@
-from bot.prefixes.prefixes import Prefixes, get_prefix
+from bot.cogs.prefixes import Prefixes, get_prefix
 import discord
 from bot.cogs.core import Core
 import os
@@ -17,3 +17,7 @@ bot.add_cog(Prefixes(bot))
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 bot.run(os.environ.get("TOKEN"))  
+
+# TO DO:
+    # FitBit Integration
+    # Strava Integration

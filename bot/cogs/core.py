@@ -55,6 +55,25 @@ class Core(commands.Cog):
         quote = await self.get_quote()
         await ctx.send(ctx.author.mention + ' ' + quote)
 
+    # WIP
+    @commands.Cog.listener()
+    async def get_workout(self) -> str:
+        response = requests.get("https://wger.de/api/v2/exercise/?language=2")
+        json_data = json.loads(response.text)
+        workout = []
+        for i in range(len(json_data["results"])):
+            workout = json_data["results"][i]["name"] + ": " + json_data["results"][i]["description"] + "\n"
+            i += 1
+
+        for r in (("<p>", ""), ("</p>", "")):
+            workout = workout.replace(*r)
+        return workout
+
+    # WIP
+    @commands.command(pass_context=True)
+    async def workout(self, ctx) -> None:
+        await self.get_workout()
+
     @loop(hours=1)
     async def posture(self) -> None:
         for self.guild in self.bot.guilds:
@@ -108,22 +127,6 @@ class Core(commands.Cog):
 
         self.initialize_id = initial_message.id
 
-    # WIP - Understand
-    async def get_message_from_payload(self, bot: commands.Bot, payload: discord.RawReactionActionEvent, user: discord.User) -> discord.Message:
-        """Return a message object from a given reaction payload."""
-        channel = await bot.fetch_channel(bot, payload.channel_id)
-        assert isinstance(channel, discord.abc.Messageable)
-
-        if channel is None:
-            if user.dm_channel is None:
-                dm_channel = await user.create_dm()
-                if dm_channel.id == payload.channel_id:
-                    channel = dm_channel
-            else:
-                raise ValueError('Payload channel not found')
-
-        return await channel.fetch_message(payload.message_id)
-
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: RawReactionActionEvent) -> None:
         if self.initialize_id != payload.message_id: 
@@ -165,3 +168,4 @@ class Core(commands.Cog):
                 member = await self.guild.fetch_member(payload.user_id)
                 if member is not None: 
                     await member.remove_roles(role) 
+
