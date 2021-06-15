@@ -2,9 +2,7 @@ import discord
 from discord.ext import commands
 from discord.ext.tasks import loop
 from discord.raw_models import RawReactionActionEvent
-import requests
-import json
-import random as r
+from bot.cogs.background import Background
 
 class Core(commands.Cog):
     """Initialize the core cog."""
@@ -12,7 +10,8 @@ class Core(commands.Cog):
     def __init__(self, bot) -> None:
         """Initialize the bot."""
         self.bot = bot
-
+        self.background = Background(bot)
+        
         self.sum = 0
         self.initialize_id = 0
         self.activities_index = 0
@@ -20,6 +19,18 @@ class Core(commands.Cog):
             discord.Activity(name=str(self.sum) + " hearts", type=discord.ActivityType.watching),
             discord.Activity(name="your health", type=discord.ActivityType.watching)
         ]
+
+    @commands.Cog.listener()
+    async def on_ready(self) -> None:
+        print(f"Logged in as {self.bot.user}.")
+
+        for self.guild in self.bot.guilds:
+            members = await self.guild.fetch_members(limit=None).flatten()
+            self.sum += len(members)
+
+        self.background.posture.start()
+        self.background.hydration.start()
+        self.statuses.start()
 
     @loop(seconds=10)
     async def statuses(self) -> None:
@@ -30,101 +41,6 @@ class Core(commands.Cog):
         self.activities_index += 1
         if self.activities_index >= len(self.activities):
             self.activities_index = 0
-
-    @commands.Cog.listener()
-    async def on_ready(self) -> None:
-        print(f"Logged in as {self.bot.user}.")
-
-        for guild in self.bot.guilds:
-            members = await guild.fetch_members(limit=None).flatten()
-            self.sum += len(members)
-
-        self.posture.start()
-        self.hydration.start()
-        self.statuses.start()
-
-    @commands.Cog.listener()
-    async def get_quote(self) -> str:
-        response = requests.get("https://type.fit/api/quotes")
-        json_data = json.loads(response.text)
-        random_quote = json_data[r.randint(0, len(json_data))]["text"] + " - " + json_data[r.randint(0, len(json_data))]["author"]
-        return random_quote
-
-    @commands.command(pass_context=True)
-    async def quote(self, ctx) -> None:
-        quote = await self.get_quote()
-        await ctx.send(ctx.author.mention + ' ' + quote)
-
-    @commands.Cog.listener()
-    async def get_workout(self) -> list:
-        response = requests.get("https://wger.de/api/v2/exercise/?language=2")
-        json_data = json.loads(response.text)
-        workouts = []
-        for i in range(5):
-            workouts.append(json_data["results"][r.randint(0, len(json_data["results"])-3)]["name"] + ": " + "\n" + json_data["results"][r.randint(0, len(json_data["results"])-3)]["description"])
-            i += 1
-        return workouts
-
-    @commands.command(pass_context=True)
-    async def workout(self, ctx) -> None:
-        workout = await self.get_workout()
-        workouts1 = [w.replace("<p>", "") for w in workout]
-        workouts2 = [w.replace("</p>", "") for w in workouts1]
-        workouts3 = [w.replace("<ul>", "") for w in workouts2]
-        workouts4 = [w.replace("</ul>", "") for w in workouts3]
-        workouts5 = [w.replace("<li>", "") for w in workouts4]
-        workouts6 = [w.replace("</li>", "") for w in workouts5]
-        workouts7 = [w.replace("<ol>", "") for w in workouts6]
-        workouts_final = [w.replace("</ol>", "") for w in workouts7]
-
-        sets = [1, 2, 3]
-        reps = [5, 10, 15]
-
-        embed = discord.Embed(
-            title = "Quick Workout",
-            description = "Below is a list of 5 exercises for you to do, good luck.",
-            colour = discord.Color.blue()
-        )
-
-        embed.set_footer(text="Stay healthy!")
-        embed.set_author(name="FitBot", icon_url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
-        embed.add_field(name="Exercises:", value="For exercises that require weights, please use whatever you are comfortable with.", inline=False)
-        embed.add_field(name="\u200b", value="\u200b")
-        embed.add_field(name="Exercise 1 " + "- " + str(r.choice(sets)) + "x" + str(r.choice(reps)) + " reps", value=workouts_final[0], inline=False)
-        embed.add_field(name="Exercise 2 " + "- " + str(r.choice(sets)) + "x" + str(r.choice(reps)) + " reps", value=workouts_final[1], inline=False)
-        embed.add_field(name="Exercise 3 " + "- " + str(r.choice(sets)) + "x" + str(r.choice(reps)) + " reps", value=workouts_final[2], inline=False)
-        embed.add_field(name="Exercise 4 " + "- " + str(r.choice(sets)) + "x" + str(r.choice(reps)) + " reps", value=workouts_final[3], inline=False)
-        embed.add_field(name="Exercise 5 " + "- " + str(r.choice(sets)) + "x" + str(r.choice(reps)) + " reps", value=workouts_final[4], inline=False)
-
-        await ctx.send(embed=embed)
-
-    @loop(hours=1)
-    async def posture(self) -> None:
-        for self.guild in self.bot.guilds:
-            role = discord.utils.find(lambda r: r.name == 'Posture Check', self.guild.roles)
-            members = [m for m in self.guild.members if role in m.roles]
-            for m in members:
-                try:
-                    await m.send((m.mention + " Hourly posture check, fix your posture!"))
-                except discord.Forbidden:
-                    pass
-
-    @loop(hours=1)
-    async def hydration(self) -> None:
-        for self.guild in self.bot.guilds:
-            role = discord.utils.find(lambda r: r.name == 'Hydration Check', self.guild.roles)
-            members = [m for m in self.guild.members if role in m.roles]
-            for m in members:
-                try:
-                    await m.send((m.mention + " Hourly hydration check, drink some water!"))
-                except discord.Forbidden:
-                    pass
-
-    @commands.command(pass_context=True, aliases=["createrole"])
-    async def create_role(self, ctx, *, name) -> None:
-        guild = ctx.guild
-        await guild.create_role(name=name)
-        await ctx.send(f"Role `{name}` has been created.")
 
     @commands.command(pass_context=True)
     async def initialize(self, ctx) -> None:
