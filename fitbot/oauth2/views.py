@@ -28,13 +28,13 @@ def exchange_code(code: str):
         "grant_type": "authorization_code",
         "code": code,
         "redirect_url": "http://localhost:8000/oauth2/login/redirect",
-        "scope": "identify"
     }   
     headers = {
         "Content-Type": "application/x-www-form-urlencoded"
     }
     response = requests.post('%s/oauth2/token' % DISCORD_API_ENDPOINT, data=data, headers=headers)
     credentials = response.json()
+    print(credentials)
     access_token = credentials['access_token']
     response = requests.get("https://discord.com/api/v8/users/@me", headers={
         "Authorization": "Bearer %s" % access_token
