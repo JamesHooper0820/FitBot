@@ -32,6 +32,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTHENTICATION_BACKENDS = [
+    'oauth2.auth.DiscordAuthenticationBackend',
+]
 
 # Application definition
 
@@ -42,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'oauth2.apps.Oauth2Config',
 ]
 
 MIDDLEWARE = [
