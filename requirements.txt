@@ -3,3 +3,4 @@ requests==2.25.1
 Django==3.2.4
 discord==1.0.1
 python-dotenv==0.17.1
+psycopg2==2.8.6
