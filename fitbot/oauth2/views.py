@@ -13,18 +13,21 @@ DISCORD_REDIRECT_URL = os.environ['DISCORD_REDIRECT_URL']
 DISCORD_REDIRECT_URI = os.environ['DISCORD_REDIRECT_URI']
 DISCORD_API_ENDPOINT = os.environ['DISCORD_API_ENDPOINT']
 
+
 def discord_login(request: HttpRequest):
     return redirect(DISCORD_REDIRECT_URL)
+
 
 def discord_login_redirect(request: HttpRequest):
     code = request.GET.get("code")
     user = exchange_code(code)
 
     discord_user = authenticate(request, user=user)
-    discord_user = list(discord_user).pop() # Removes queryset
+    discord_user = list(discord_user).pop()  # Removes queryset
     login(request, discord_user)
 
     return redirect("/oauth2/user")
+
 
 def exchange_code(code: str):
     data = {
@@ -33,11 +36,15 @@ def exchange_code(code: str):
         "grant_type": "authorization_code",
         "code": code,
         "redirect_uri": DISCORD_REDIRECT_URI
-    }   
+    }
     headers = {
         "Content-Type": "application/x-www-form-urlencoded"
     }
-    response = requests.post('%s/oauth2/token' % DISCORD_API_ENDPOINT, data=data, headers=headers)
+    response = requests.post(
+        '%s/oauth2/token' %
+        DISCORD_API_ENDPOINT,
+        data=data,
+        headers=headers)
     credentials = response.json()
     access_token = credentials['access_token']
 
@@ -46,6 +53,7 @@ def exchange_code(code: str):
     })
 
     return response.json()
+
 
 @login_required(login_url="/oauth2/login")
 def get_authenticated_user(request: HttpRequest):
