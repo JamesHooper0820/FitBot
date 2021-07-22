@@ -1,11 +1,13 @@
 import json
 from discord.ext import commands
 
+
 async def get_prefix(_, message) -> str:
     with open("bot/cogs/prefixes.json", "r") as f:
         prefixes = json.load(f)
 
     return prefixes.get(str(message.guild.id), "!")
+
 
 class Prefixes(commands.Cog):
     """Initialize the prefixes cog."""
