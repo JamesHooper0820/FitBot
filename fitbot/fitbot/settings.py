@@ -33,7 +33,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 AUTHENTICATION_BACKENDS = [
-    'oauth2.auth.DiscordAuthenticationBackend', # BUG: Can't login to admin
+    'oauth2.auth.DiscordAuthenticationBackend', # BUG: Can't login to admin through localhost
     'django.contrib.auth.backends.ModelBackend',
 ]
 

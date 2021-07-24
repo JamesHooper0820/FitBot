@@ -1,3 +1,4 @@
+import asyncio
 import discord
 from discord.ext import commands
 import requests
@@ -7,6 +8,10 @@ import random as r
 
 class Commands(commands.Cog):
     """Initialize the commands cog."""
+
+    def __init__(self, bot) -> None:
+        """Initialize the bot."""
+        self.bot = bot
 
     @commands.command(pass_context=True, aliases=["createrole"])
     async def create_role(self, ctx, *, name) -> None:
@@ -109,3 +114,76 @@ class Commands(commands.Cog):
                         " reps", value=workouts[4], inline=False)
 
         await ctx.send(embed=embed)
+
+    # WIP
+    @commands.command(pass_context=True, aliases=["bmi"])
+    async def bmi_calculator(self, ctx):
+        await ctx.send("Please note, the following information is **not** saved by FitBot.")
+
+        height = await self.height_listener(ctx)
+        while (height == False):
+            await self.height_listener(ctx)
+
+        weight = await self.weight_listener(ctx)
+        while (weight == False):
+            await self.weight_listener(ctx)
+
+        bmi = float(self.weight_msg.content) / (float(self.height_msg.content)/100)**2
+        await ctx.send(f"Your BMI (Body Mass Index) is {bmi}.")
+
+        if bmi <= 18.4:
+            await ctx.send("You classed as `underweight`.")
+        elif bmi <= 24.9:
+            await ctx.send("You are `healthy`.")
+        elif bmi <= 29.9:
+            await ctx.send("You are `overweight`.")
+        elif bmi <= 34.9:
+            await ctx.send("You are `severely overweight`.")
+        elif bmi <= 39.9:
+            await ctx.send("You are `obese`.")
+        else:
+            await ctx.send("You are `severely obese`.")
+
+        await ctx.send("Don't worry if it's not what you want it to be, **you** can make the difference!")
+
+        height, weight = False
+
+    @commands.Cog.listener()
+    async def height_listener(self, ctx) -> int:
+        await ctx.send("Please enter your height in `cm`:")
+
+        def check_height(msg) -> bool:
+            value = msg.content
+
+            return msg.author == ctx.author and msg.channel == ctx.channel and \
+            type(value) is int or float
+
+        try:
+            self.height_msg = await self.bot.wait_for("message", check=check_height, timeout=30)
+            await ctx.send(f"Height selected: {self.height_msg.content}cm.")
+        except asyncio.TimeoutError:
+            await ctx.send("Sorry, you didn't respond in time! Please enter your height.")
+            return False
+        else:
+            await self.height_msg.add_reaction("👍")
+            return True
+
+    @commands.Cog.listener()
+    async def weight_listener(self, ctx) -> int:
+        await ctx.send("Please enter your weight in `kg`:")
+
+        def check_weight(msg) -> bool:
+            value = msg.content
+
+            return msg.author == ctx.author and msg.channel == ctx.channel and \
+            type(value) is int or float
+
+        try:
+            self.weight_msg = await self.bot.wait_for("message", check=check_weight, timeout=30)
+            await ctx.send(f"Weight selected: {self.weight_msg.content}kg.")
+        except asyncio.TimeoutError:
+            await ctx.send("Sorry, you didn't respond in time! Please enter your weight.")
+            return False
+        else:
+            await self.weight_msg.add_reaction("👍")
+            return True
