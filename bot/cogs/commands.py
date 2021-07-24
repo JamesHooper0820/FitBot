@@ -115,17 +115,16 @@ class Commands(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    # WIP
     @commands.command(pass_context=True, aliases=["bmi"])
     async def bmi_calculator(self, ctx):
         await ctx.send("Please note, the following information is **not** saved by FitBot.")
 
-        height = await self.height_listener(ctx)
-        while (height == False):
+        self.height = await self.height_listener(ctx)
+        while (self.height == False):
             await self.height_listener(ctx)
 
-        weight = await self.weight_listener(ctx)
-        while (weight == False):
+        self.weight = await self.weight_listener(ctx)
+        while (self.weight == False):
             await self.weight_listener(ctx)
 
         bmi = float(self.weight_msg.content) / (float(self.height_msg.content)/100)**2
@@ -163,10 +162,12 @@ class Commands(commands.Cog):
             await ctx.send(f"Height selected: {self.height_msg.content}cm.")
         except asyncio.TimeoutError:
             await ctx.send("Sorry, you didn't respond in time! Please enter your height.")
-            return False
+            self.height = False
+            return self.height
         else:
             await self.height_msg.add_reaction("👍")
-            return True
+            self.height = True
+            return self.height
 
     @commands.Cog.listener()
     async def weight_listener(self, ctx) -> int:
@@ -183,7 +184,9 @@ class Commands(commands.Cog):
             await ctx.send(f"Weight selected: {self.weight_msg.content}kg.")
         except asyncio.TimeoutError:
             await ctx.send("Sorry, you didn't respond in time! Please enter your weight.")
-            return False
+            self.weight = False
+            return self.weight
         else:
             await self.weight_msg.add_reaction("👍")
-            return True
+            self.weight = True
+            return self.weight
