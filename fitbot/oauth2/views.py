@@ -2,7 +2,7 @@ import os
 import requests
 
 from django.http import HttpRequest
-from django.http.response import JsonResponse
+from django.http.response import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -14,16 +14,16 @@ DISCORD_REDIRECT_URI = os.environ['DISCORD_REDIRECT_URI']
 DISCORD_API_ENDPOINT = os.environ['DISCORD_API_ENDPOINT']
 
 
-def discord_login(request: HttpRequest):
+def discord_login(request: HttpRequest) -> HttpResponseRedirect:
     return redirect(DISCORD_REDIRECT_URL)
 
 
-def discord_login_redirect(request: HttpRequest):
+def discord_login_redirect(request: HttpRequest) -> HttpResponseRedirect:
     code = request.GET.get("code")
     user = exchange_code(code)
 
     discord_user = authenticate(request, user=user)
-    discord_user = list(discord_user).pop()  # Removes queryset
+    discord_user = list(discord_user).pop()
     login(request, discord_user)
 
     return redirect("/oauth2/user")
@@ -56,5 +56,5 @@ def exchange_code(code: str):
 
 
 @login_required(login_url="/oauth2/login")
-def get_authenticated_user(request: HttpRequest):
+def get_authenticated_user(request: HttpRequest) -> JsonResponse:
     return JsonResponse({"msg": "Authenticated"})
