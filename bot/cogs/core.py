@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord.ext.tasks import loop
 from discord.raw_models import RawReactionActionEvent
 from bot.cogs.background import Background
-
+from .prefixes import get_prefix
 
 class Core(commands.Cog):
     """Initialize the core cog."""
@@ -23,7 +23,12 @@ class Core(commands.Cog):
                 type=discord.ActivityType.watching),
             discord.Activity(
                 name="your health",
-                type=discord.ActivityType.watching)]
+                type=discord.ActivityType.watching),
+            discord.Activity(
+                name="!initialize",
+                type=discord.ActivityType.listening)]
+
+        self.initialize_called = False
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
@@ -36,6 +41,27 @@ class Core(commands.Cog):
         self.background.posture.start()
         self.background.hydration.start()
         self.statuses.start()
+
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild) -> None:
+        embed = discord.Embed(
+            title=(f"Thank you for adding FitBot to {guild.name}!"),
+            description=(f"To setup FitBot, type `!initialize`."),
+            colour=discord.Color.blue())
+
+        embed.set_footer(text="Stay healthy!")
+        embed.set_author(
+            name="FitBot",
+            icon_url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
+        
+        channel = guild.text_channels[0]
+        await channel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_guild_remove(self, guild) -> None:
+        self.background.posture.stop()
+        self.background.hydration.stop()
+        self.statuses.stop()
 
     @loop(seconds=10)
     async def statuses(self) -> None:
@@ -58,10 +84,6 @@ class Core(commands.Cog):
             colour=discord.Color.blue())
 
         embed.set_footer(text="Stay healthy!")
-        embed.set_image(
-            url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
-        embed.set_thumbnail(
-            url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
         embed.set_author(
             name="FitBot",
             icon_url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
@@ -69,14 +91,18 @@ class Core(commands.Cog):
             name="Reactions",
             value="Click on the reactions to this message in order to access roles:",
             inline=False)
-        embed.add_field(name="🧍", value="Posture Checker Role", inline=False)
-        embed.add_field(name="🚰", value="Hydration Checker Role", inline=False)
+        embed.add_field(name="\u200b", value="🧍 = Posture Checker Role", inline=False)
+        embed.add_field(name="\u200b", value="🚰 = Hydration Checker Role", inline=False)
 
         initial_message = await ctx.send(embed=embed)
         await initial_message.add_reaction("🧍")
         await initial_message.add_reaction("🚰")
 
         self.initialize_id = initial_message.id
+
+        self.initialize_called = True
+        if (self.initialize_called == True):
+            self.activities.pop()
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: RawReactionActionEvent) -> None:

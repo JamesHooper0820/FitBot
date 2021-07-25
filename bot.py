@@ -1,4 +1,3 @@
-from bot.cogs.background import Background
 import discord
 from bot.cogs.core import Core
 from bot.cogs.commands import Commands

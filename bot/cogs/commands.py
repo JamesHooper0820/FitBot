@@ -131,7 +131,7 @@ class Commands(commands.Cog):
         await ctx.send(f"Your BMI (Body Mass Index) is {bmi}.")
 
         if bmi <= 18.4:
-            await ctx.send("You classed as `underweight`.")
+            await ctx.send("You are `underweight`.")
         elif bmi <= 24.9:
             await ctx.send("You are `healthy`.")
         elif bmi <= 29.9:
