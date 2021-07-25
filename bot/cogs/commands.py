@@ -128,7 +128,7 @@ class Commands(commands.Cog):
             await self.weight_listener(ctx)
 
         bmi = float(self.weight_msg.content) / (float(self.height_msg.content)/100)**2
-        await ctx.send(f"Your BMI (Body Mass Index) is {bmi}.")
+        await ctx.send(f"Your BMI (Body Mass Index) is {bmi:.2f}.")
 
         if bmi <= 18.4:
             await ctx.send("You are `underweight`.")
@@ -145,7 +145,8 @@ class Commands(commands.Cog):
 
         await ctx.send("Don't worry if it's not what you want it to be, **you** can make the difference!")
 
-        height, weight = False
+        height = False
+        weight = False
 
     @commands.Cog.listener()
     async def height_listener(self, ctx) -> int:
@@ -153,9 +154,11 @@ class Commands(commands.Cog):
 
         def check_height(msg) -> bool:
             value = msg.content
-
-            return msg.author == ctx.author and msg.channel == ctx.channel and \
-            type(value) is int or float
+            try:
+                return msg.author == ctx.author and msg.channel == ctx.channel and \
+                isinstance(float(value), float)
+            except ValueError:
+                return False
 
         try:
             self.height_msg = await self.bot.wait_for("message", check=check_height, timeout=30)
@@ -175,9 +178,11 @@ class Commands(commands.Cog):
 
         def check_weight(msg) -> bool:
             value = msg.content
-
-            return msg.author == ctx.author and msg.channel == ctx.channel and \
-            type(value) is int or float
+            try:
+                return msg.author == ctx.author and msg.channel == ctx.channel and \
+                isinstance(float(value), float)
+            except ValueError:
+                return False
 
         try:
             self.weight_msg = await self.bot.wait_for("message", check=check_weight, timeout=30)
