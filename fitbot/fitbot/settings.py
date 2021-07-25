@@ -30,12 +30,15 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 AUTHENTICATION_BACKENDS = [
-    'oauth2.auth.DiscordAuthenticationBackend', # BUG: Can't login to admin through localhost
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+AUTH_USER_MODEL = 'oauth2.DiscordUser'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigIntegerField'
 
 # Application definition
 

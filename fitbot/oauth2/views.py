@@ -21,10 +21,9 @@ def discord_login(request: HttpRequest) -> HttpResponseRedirect:
 def discord_login_redirect(request: HttpRequest) -> HttpResponseRedirect:
     code = request.GET.get("code")
     user = exchange_code(code)
-
-    discord_user = authenticate(request, user=user, backend='oauth2.auth.DiscordAuthenticationBackend')
-    discord_user = list(discord_user).pop()
-    login(request, discord_user, backend='oauth2.auth.DiscordAuthenticationBackend')
+    
+    user = authenticate(request, user=user)
+    login(request, user=user)
 
     return redirect("/oauth2/user")
 
