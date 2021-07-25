@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord.ext.tasks import loop
 from discord.raw_models import RawReactionActionEvent
 from bot.cogs.background import Background
-from .prefixes import get_prefix
+
 
 class Core(commands.Cog):
     """Initialize the core cog."""
@@ -23,12 +23,7 @@ class Core(commands.Cog):
                 type=discord.ActivityType.watching),
             discord.Activity(
                 name="your health",
-                type=discord.ActivityType.watching),
-            discord.Activity(
-                name="!initialize",
-                type=discord.ActivityType.listening)]
-
-        self.initialize_called = False
+                type=discord.ActivityType.watching)]
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
@@ -99,10 +94,6 @@ class Core(commands.Cog):
         await initial_message.add_reaction("🚰")
 
         self.initialize_id = initial_message.id
-
-        self.initialize_called = True
-        if (self.initialize_called == True):
-            self.activities.pop()
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: RawReactionActionEvent) -> None:
