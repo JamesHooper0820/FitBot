@@ -23,5 +23,10 @@ load_dotenv(dotenv_path)
 bot.run(os.environ.get("TOKEN"))
 
 # TO DO:
+# Calorie Calculator - Put disclaimer saying 'Please note, not medical advice'
+# Weekly Calorie Tracker - Tracks last 7 days of calorie inputs, with 7-day average
+# EOD Summary - Total calories and water that day
+# Leaderboard - Sub-leaderboards could include Running, Steps, Cycling, Swimming, Calories Burnt
+# Logging
 # FitBit Integration
 # Strava Integration
