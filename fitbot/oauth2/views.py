@@ -12,6 +12,7 @@ DISCORD_CLIENT_SECRET = os.environ['DISCORD_CLIENT_SECRET']
 DISCORD_REDIRECT_URL = os.environ['DISCORD_REDIRECT_URL']
 DISCORD_REDIRECT_URI = os.environ['DISCORD_REDIRECT_URI']
 DISCORD_API_ENDPOINT = os.environ['DISCORD_API_ENDPOINT']
+DISCORD_BOT = os.environ['DISCORD_BOT']
 
 
 def discord_login(request: HttpRequest) -> HttpResponseRedirect:
@@ -26,6 +27,10 @@ def discord_login_redirect(request: HttpRequest) -> HttpResponseRedirect:
     login(request, user=user)
 
     return redirect("/oauth2/user")
+
+
+def bot_login(request: HttpRequest) -> HttpResponseRedirect:
+    return redirect(DISCORD_BOT)
 
 
 def exchange_code(code: str):

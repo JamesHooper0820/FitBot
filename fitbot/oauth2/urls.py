@@ -11,6 +11,10 @@ urlpatterns = [
         views.discord_login_redirect,
         name='discord_login_redirect'),
     path(
+        'bot/',
+        views.bot_login,
+        name='bot_login'),
+    path(
         'user/',
         views.get_authenticated_user,
         name='get_authenticated_user'),
