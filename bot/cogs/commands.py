@@ -118,6 +118,12 @@ class Commands(commands.Cog):
     @commands.command(pass_context=True, aliases=["bmi"])
     async def bmi_calculator(self, ctx):
         await ctx.send("Please note, the following information is **not** saved by FitBot.")
+        await ctx.send("There are limitations of the BMI, such as it not being able to "
+        "tell the difference between excess fat, muscle or bone. It also doesn't take into account "
+        "age, gender or muscle mass. Please don't use the BMI as a form of medical advice.")
+        
+        self.height = False
+        self.weight = False
 
         self.height = await self.height_listener(ctx)
         while (self.height == False):
@@ -128,25 +134,23 @@ class Commands(commands.Cog):
             await self.weight_listener(ctx)
 
         bmi = float(self.weight_msg.content) / (float(self.height_msg.content)/100)**2
-        await ctx.send(f"Your BMI (Body Mass Index) is {bmi:.2f}.")
+        await ctx.send(ctx.author.mention + f" Your BMI (Body Mass Index) is `{bmi:.2f}`.")
 
         if bmi <= 18.4:
-            await ctx.send("You are `underweight`.")
+            await ctx.send("You are classed as `underweight`.")
         elif bmi <= 24.9:
-            await ctx.send("You are `healthy`.")
+            await ctx.send("You are classed as `healthy`.")
         elif bmi <= 29.9:
-            await ctx.send("You are `overweight`.")
+            await ctx.send("You are classed as `overweight`.")
         elif bmi <= 34.9:
-            await ctx.send("You are `severely overweight`.")
+            await ctx.send("You are classed as `severely overweight`.")
         elif bmi <= 39.9:
-            await ctx.send("You are `obese`.")
+            await ctx.send("You are classed as `obese`.")
         else:
-            await ctx.send("You are `severely obese`.")
+            await ctx.send("You are classed as `severely obese`.")
 
         await ctx.send("Don't worry if it's not what you want it to be, **you** can make the difference!")
 
-        height = False
-        weight = False
 
     @commands.Cog.listener()
     async def height_listener(self, ctx) -> int:
@@ -162,7 +166,7 @@ class Commands(commands.Cog):
 
         try:
             self.height_msg = await self.bot.wait_for("message", check=check_height, timeout=30)
-            await ctx.send(f"Height selected: {self.height_msg.content}cm.")
+            await ctx.send(f"Height selected: `{self.height_msg.content}cm`.")
         except asyncio.TimeoutError:
             await ctx.send("Sorry, you didn't respond in time! Please enter your height.")
             self.height = False
@@ -186,7 +190,7 @@ class Commands(commands.Cog):
 
         try:
             self.weight_msg = await self.bot.wait_for("message", check=check_weight, timeout=30)
-            await ctx.send(f"Weight selected: {self.weight_msg.content}kg.")
+            await ctx.send(f"Weight selected: `{self.weight_msg.content}kg`.")
         except asyncio.TimeoutError:
             await ctx.send("Sorry, you didn't respond in time! Please enter your weight.")
             self.weight = False
@@ -195,3 +199,89 @@ class Commands(commands.Cog):
             await self.weight_msg.add_reaction("👍")
             self.weight = True
             return self.weight
+
+    @commands.Cog.listener()
+    async def age_listener(self, ctx) -> int:
+        await ctx.send("Please enter your age:")
+
+        def check_age(msg) -> bool:
+            value = msg.content
+            try:
+                return msg.author == ctx.author and msg.channel == ctx.channel and \
+                isinstance(float(value), float)
+            except ValueError:
+                return False
+
+        try:
+            self.age_msg = await self.bot.wait_for("message", check=check_age, timeout=30)
+            await ctx.send(f"Age selected: `{self.age_msg.content}`.")
+        except asyncio.TimeoutError:
+            await ctx.send("Sorry, you didn't respond in time! Please enter your age.")
+            self.age = False
+            return self.age
+        else:
+            await self.age_msg.add_reaction("👍")
+            self.age = True
+            return self.age
+
+    @commands.Cog.listener()
+    async def gender_listener(self, ctx) -> str:
+        await ctx.send("Please enter your gender, type `m` for `male`, and `f` for `female`:")
+
+        def check_gender(msg) -> bool:
+            value = msg.content
+            try:
+                return msg.author == ctx.author and msg.channel == ctx.channel and \
+                (value == 'm' or value == 'f')
+            except ValueError:
+                return False
+
+        try:
+            self.gender_msg = await self.bot.wait_for("message", check=check_gender, timeout=30)
+            if self.gender_msg.content.lower() == 'm':
+                await ctx.send("Gender selected: `Male`.")
+            else:
+                await ctx.send("Gender selected: `Female`.")
+        except asyncio.TimeoutError:
+            await ctx.send("Sorry, you didn't respond in time! Please enter your gender.")
+            self.gender = False
+            return self.gender
+        else:
+            await self.gender_msg.add_reaction("👍")
+            self.gender = True
+            return self.gender
+
+    # WIP - Add activity amount option
+    @commands.command(pass_context=True, aliases=["calories"])
+    async def calorie_calculator(self, ctx):
+        await ctx.send("Please note, the following information is **not** saved by FitBot.")
+        await ctx.send("Don't use this calorie calculator as medical advice. "
+        "If you are unsure about your diet, please consult a professional dietician.")
+
+        self.height = False
+        self.weight = False
+        self.age = False
+        self.gender = False
+
+        self.height = await self.height_listener(ctx)
+        while (self.height == False):
+            await self.height_listener(ctx)
+
+        self.weight = await self.weight_listener(ctx)
+        while (self.weight == False):
+            await self.weight_listener(ctx)
+
+        self.age = await self.age_listener(ctx)
+        while (self.age == False):
+            await self.age_listener(ctx)
+
+        self.gender = await self.gender_listener(ctx)
+        while (self.gender == False):
+            await self.gender_listener(ctx)
+
+        if self.gender_msg.content.lower() == 'm':
+            msj_equation = (10 * float(self.weight_msg.content)) + (6.25 * float(self.height_msg.content)) - (5 * float(self.age_msg.content)) + 5
+        else:
+            msj_equation = (10 * float(self.weight_msg.content)) + (6.25 * float(self.height_msg.content)) - (5 * float(self.age_msg.content)) - 161
+        
+        await ctx.send(ctx.author.mention + f" To maintain your current weight, you should be aiming to consume around `{msj_equation:.0f}` calories a day.")
