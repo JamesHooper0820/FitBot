@@ -240,8 +240,12 @@ class Commands(commands.Cog):
             self.gender_msg = await self.bot.wait_for("message", check=check_gender, timeout=30)
             if self.gender_msg.content.lower() == 'm':
                 await ctx.send("Gender selected: `Male`.")
-            else:
+            elif self.gender_msg.content.lower() == 'f':
                 await ctx.send("Gender selected: `Female`.")
+            else:
+                await ctx.send("Invalid input, please try again.")
+                self.gender = False
+                return self.gender
         except asyncio.TimeoutError:
             await ctx.send("Sorry, you didn't respond in time! Please enter your gender.")
             self.gender = False
@@ -251,7 +255,52 @@ class Commands(commands.Cog):
             self.gender = True
             return self.gender
 
-    # WIP - Add activity amount option
+    @commands.Cog.listener()
+    async def activity_listener(self, ctx) -> str:
+        await ctx.send("Please enter your activity level, type:\n"
+        "`1` for Sedentary: little or no exercise\n"
+        "`2` for Light: exercise 1-3 times/week\n"
+        "`3` for Moderate: exercise 4-5 times/week\n"
+        "`4` for Active: daily exercise or intense exercise 3-4 times/week\n"
+        "`5` for Very Active: intense exercise 6-7 times/week\n"
+        "`6` for Extremely Active: very intense exercise daily\n")
+
+        def check_activity(msg) -> bool:
+            value = msg.content
+            try:
+                valid_inputs = ['1', '2', '3', '4', '5', '6']
+                return msg.author == ctx.author and msg.channel == ctx.channel and \
+                (value in valid_inputs)
+            except ValueError:
+                return False
+
+        try:
+            self.activity_msg = await self.bot.wait_for("message", check=check_activity, timeout=30)
+            if self.activity_msg.content.lower() == '1':
+                await ctx.send("Activity level selected: `Sedentary: little or no exercise`.")
+            elif self.activity_msg.content.lower() == '2':
+                await ctx.send("Activity level selected: `Light: exercise 1-3 times/week`.")
+            elif self.activity_msg.content.lower() == '3':
+                await ctx.send("Activity level selected: `Moderate: exercise 4-5 times/week`.")
+            elif self.activity_msg.content.lower() == '4':
+                await ctx.send("Activity level selected: `Active: daily exercise or intense exercise 3-4 times/week`.")
+            elif self.activity_msg.content.lower() == '5':
+                await ctx.send("Activity level selected: `Very Active: intense exercise 6-7 times/week`.")
+            elif self.activity_msg.content.lower() == '6':
+                await ctx.send("Activity level selected: `Extremely Active: very intense exercise daily`.")
+            else:
+                await ctx.send("Invalid input, please try again.")
+                self.activity = False
+                return self.activity
+        except asyncio.TimeoutError:
+            await ctx.send("Sorry, you didn't respond in time! Please enter your activity level.")
+            self.activity = False
+            return self.activity
+        else:
+            await self.activity_msg.add_reaction("👍")
+            self.activity = True
+            return self.activity
+
     @commands.command(pass_context=True, aliases=["calories"])
     async def calorie_calculator(self, ctx):
         await ctx.send("Please note, the following information is **not** saved by FitBot.")
@@ -262,6 +311,7 @@ class Commands(commands.Cog):
         self.weight = False
         self.age = False
         self.gender = False
+        self.activity = False
 
         self.height = await self.height_listener(ctx)
         while (self.height == False):
@@ -278,10 +328,33 @@ class Commands(commands.Cog):
         self.gender = await self.gender_listener(ctx)
         while (self.gender == False):
             await self.gender_listener(ctx)
+        
+        self.acitivty = await self.activity_listener(ctx)
+        while (self.acitivty == False):
+            await self.activity_listener(ctx)
 
         if self.gender_msg.content.lower() == 'm':
             msj_equation = (10 * float(self.weight_msg.content)) + (6.25 * float(self.height_msg.content)) - (5 * float(self.age_msg.content)) + 5
-        else:
+        elif self.gender_msg.content.lower() == 'f':
             msj_equation = (10 * float(self.weight_msg.content)) + (6.25 * float(self.height_msg.content)) - (5 * float(self.age_msg.content)) - 161
-        
-        await ctx.send(ctx.author.mention + f" To maintain your current weight, you should be aiming to consume around `{msj_equation:.0f}` calories a day.")
+        else:
+            return
+
+        if self.activity_msg.content == '1':
+            total_calories = msj_equation * 1.2
+        elif self.activity_msg.content == '2':
+            total_calories = msj_equation * 1.375
+        elif self.activity_msg.content == '3':
+            total_calories = msj_equation * 1.465
+        elif self.activity_msg.content == '4':
+            total_calories = msj_equation * 1.55
+        elif self.activity_msg.content == '5':
+            total_calories = msj_equation * 1.725
+        elif self.activity_msg.content == '6':
+            total_calories = msj_equation * 1.9
+        else:
+            return
+
+        await ctx.send(ctx.author.mention + f" Your Basal Metabolic Rate (BMR) is `{msj_equation:.0f}` calories. This is the "
+        "number of calories your body burns just to function properly.")
+        await ctx.send(f"To maintain your current weight, you should aim to consume `{total_calories:.0f}` calories per day.")
