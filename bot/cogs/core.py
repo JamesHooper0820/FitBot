@@ -75,7 +75,7 @@ class Core(commands.Cog):
 
         embed = discord.Embed(
             title="Introducing FitBot!",
-            description="FitBot is a fitness, health and well-being discord bot designed to enhance and encourage people to take care of their physical and mental health.",
+            description="FitBot is Discord's first dedicated fitness, health and well-being bot, designed to enhance and encourage people to take care of their physical and mental health.",
             colour=discord.Color.blue())
 
         embed.set_footer(text="Stay healthy!")
@@ -88,6 +88,11 @@ class Core(commands.Cog):
             inline=False)
         embed.add_field(name="\u200b", value="🧍 = Posture Checker Role", inline=False)
         embed.add_field(name="\u200b", value="🚰 = Hydration Checker Role", inline=False)
+        embed.add_field(name="\u200b", value="\u200b", inline=False)
+        embed.add_field(
+            name="Help",
+            value="Use the `!help` command for assistance.",
+            inline=False)
 
         initial_message = await ctx.send(embed=embed)
         await initial_message.add_reaction("🧍")

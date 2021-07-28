@@ -13,6 +13,19 @@ class Commands(commands.Cog):
         """Initialize the bot."""
         self.bot = bot
 
+    @commands.command(pass_context=True)
+    async def help(self, ctx):
+        await ctx.send("```List of Commands:\n"
+        "\n"
+        "!initialize - Initializes bot\n"
+        "!quote - Random inspirational quote\n"
+        "!workout - Random 5-piece workout\n"
+        "!bmi - BMI calculator\n"
+        "!calories - Calorie calculator\n"
+        "!changeprefix - Change command prefix\n"
+        "!createrole - Create role\n"
+        "!help - Help command\n```")
+
     @commands.command(pass_context=True, aliases=["createrole"])
     async def create_role(self, ctx, *, name) -> None:
         guild = ctx.guild
