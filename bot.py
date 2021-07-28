@@ -23,7 +23,6 @@ load_dotenv(dotenv_path)
 bot.run(os.environ.get("TOKEN"))
 
 # TO DO:
-# Custom !help Command
 # Weekly Calorie Tracker - Tracks last 7 days of calorie inputs, with 7-day average
 # EOD Summary - Total calories and water that day
 # Leaderboard - Sub-leaderboards could include Running, Steps, Cycling, Swimming, Calories Burnt
