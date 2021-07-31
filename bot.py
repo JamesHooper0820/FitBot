@@ -23,9 +23,10 @@ load_dotenv(dotenv_path)
 bot.run(os.environ.get("TOKEN"))
 
 # TO DO:
+# Discord Buttons & Dropdowns - Improve flow of Bot (discord-components)
 # Weekly Calorie Tracker - Tracks last 7 days of calorie inputs, with 7-day average
 # EOD Summary - Total calories and water that day
-# Leaderboard - Sub-leaderboards could include Running, Steps, Cycling, Swimming, Calories Burnt
+# Leaderboard - Sub-leaderboards (sub-commands) could include Running, Steps, Cycling, Swimming, Calories Burnt
 # Logging
 # FitBit Integration
 # Strava Integration

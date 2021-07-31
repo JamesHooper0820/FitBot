@@ -1,6 +1,5 @@
-discord.py==1.7.2
-requests==2.25.1
 Django==3.2.4
-discord==1.0.1
-python-dotenv==0.17.1
-psycopg2==2.8.6
+discord.py==2.0.0a3440+g3a451c9c
+requests==2.25.1
+discord==1.7.3
+python-dotenv==0.19.0
