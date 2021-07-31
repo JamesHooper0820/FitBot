@@ -17,7 +17,7 @@ class Commands(commands.Cog):
     async def help(self, ctx):
         await ctx.send("```List of Commands:\n"
         "\n"
-        "!initialize - Initializes bot\n"
+        "!initialize - Initializes FitBot\n"
         "!quote - Random inspirational quote\n"
         "!workout - Random 5-piece workout\n"
         "!bmi - BMI calculator\n"

@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord.ext.tasks import loop
 from discord.raw_models import RawReactionActionEvent
+from dislash import *
 from bot.cogs.background import Background
 
 
@@ -68,7 +69,10 @@ class Core(commands.Cog):
         if self.activities_index >= len(self.activities):
             self.activities_index = 0
 
-    @commands.command(pass_context=True)
+    # WIP
+    @slash_commands.command(
+    description="Initializes FitBot"
+    )
     async def initialize(self, ctx) -> None:
         await ctx.guild.create_role(name="Posture Check", mentionable=True, colour=discord.Colour(0x34e12f))
         await ctx.guild.create_role(name="Hydration Check", mentionable=True, colour=discord.Colour(0x45c7ea))
