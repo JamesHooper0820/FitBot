@@ -4,6 +4,7 @@ from discord.ext import commands
 import requests
 import json
 import random as r
+from discord_slash import cog_ext
 
 
 class Commands(commands.Cog):
@@ -13,24 +14,17 @@ class Commands(commands.Cog):
         """Initialize the bot."""
         self.bot = bot
 
-    @commands.command(pass_context=True)
-    async def help(self, ctx):
+    @cog_ext.cog_slash(name="help",
+    description="Help command.")
+    async def help(self, ctx) -> None:
         await ctx.send("```List of Commands:\n"
         "\n"
-        "!initialize - Initializes FitBot\n"
-        "!quote - Random inspirational quote\n"
-        "!workout - Random 5-piece workout\n"
-        "!bmi - BMI calculator\n"
-        "!calories - Calorie calculator\n"
-        "!changeprefix - Change command prefix\n"
-        "!createrole - Create role\n"
-        "!help - Help command\n```")
-
-    @commands.command(pass_context=True, aliases=["createrole"])
-    async def create_role(self, ctx, *, name) -> None:
-        guild = ctx.guild
-        await guild.create_role(name=name)
-        await ctx.send(f"Role `{name}` has been created.")
+        "/initialize - Initializes FitBot\n"
+        "/quote - Random inspirational quote\n"
+        "/workout - Random 5-piece workout\n"
+        "/bmi - BMI calculator\n"
+        "/calories - Calorie calculator\n"
+        "/help - Help command\n```")
 
     @commands.Cog.listener()
     async def get_quote(self) -> str:
@@ -40,7 +34,8 @@ class Commands(commands.Cog):
             json_data))]["text"] + " - " + json_data[r.randint(0, len(json_data))]["author"]
         return random_quote
 
-    @commands.command(pass_context=True)
+    @cog_ext.cog_slash(name="quote",
+    description="Random inspirational quote.")
     async def quote(self, ctx) -> None:
         quote = await self.get_quote()
         await ctx.send(ctx.author.mention + ' ' + quote)
@@ -56,7 +51,8 @@ class Commands(commands.Cog):
             i += 1
         return workouts
 
-    @commands.command(pass_context=True)
+    @cog_ext.cog_slash(name="workout",
+    description="Random 5-piece workout.")
     async def workout(self, ctx) -> None:
         workout = await self.get_workout()
         workouts = [
@@ -128,7 +124,8 @@ class Commands(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(pass_context=True, aliases=["bmi"])
+    @cog_ext.cog_slash(name="bmi",
+    description="BMI calculator.")
     async def bmi_calculator(self, ctx):
         await ctx.send("Please note, the following information is **not** saved by FitBot.")
         await ctx.send("There are limitations of the BMI, such as it not being able to "
@@ -314,7 +311,8 @@ class Commands(commands.Cog):
             self.activity = True
             return self.activity
 
-    @commands.command(pass_context=True, aliases=["calories"])
+    @cog_ext.cog_slash(name="calories",
+    description="Calorie calculator.")
     async def calorie_calculator(self, ctx):
         await ctx.send("Please note, the following information is **not** saved by FitBot.")
         await ctx.send("Don't use this calorie calculator as medical advice. "

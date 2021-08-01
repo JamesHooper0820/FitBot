@@ -2,8 +2,8 @@ import discord
 from discord.ext import commands
 from discord.ext.tasks import loop
 from discord.raw_models import RawReactionActionEvent
-from dislash import *
-from bot.cogs.background import Background
+from .background import Background
+from discord_slash import cog_ext
 
 
 class Core(commands.Cog):
@@ -42,7 +42,7 @@ class Core(commands.Cog):
     async def on_guild_join(self, guild) -> None:
         embed = discord.Embed(
             title=(f"Thank you for adding FitBot to {guild.name}!"),
-            description=(f"To setup FitBot, type `!initialize`."),
+            description=(f"To setup FitBot, type `/initialize`."),
             colour=discord.Color.blue())
 
         embed.set_footer(text="Stay healthy!")
@@ -50,7 +50,7 @@ class Core(commands.Cog):
             name="FitBot",
             icon_url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
         
-        channel = guild.text_channels[0]
+        channel = guild.text_channels[0] # Could be a problem if bot doesn't have perms to that channel index 0
         await channel.send(embed=embed)
 
     @commands.Cog.listener()
@@ -69,10 +69,8 @@ class Core(commands.Cog):
         if self.activities_index >= len(self.activities):
             self.activities_index = 0
 
-    # WIP
-    @slash_commands.command(
-    description="Initializes FitBot"
-    )
+    @cog_ext.cog_slash(name="initialize",
+    description="Initializes FitBot.")
     async def initialize(self, ctx) -> None:
         await ctx.guild.create_role(name="Posture Check", mentionable=True, colour=discord.Colour(0x34e12f))
         await ctx.guild.create_role(name="Hydration Check", mentionable=True, colour=discord.Colour(0x45c7ea))
@@ -95,7 +93,7 @@ class Core(commands.Cog):
         embed.add_field(name="\u200b", value="\u200b", inline=False)
         embed.add_field(
             name="Help",
-            value="Use the `!help` command for assistance.",
+            value="Use the `/help` command for assistance.",
             inline=False)
 
         initial_message = await ctx.send(embed=embed)
