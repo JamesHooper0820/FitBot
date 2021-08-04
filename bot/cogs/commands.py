@@ -248,7 +248,7 @@ class Commands(commands.Cog):
         await self.send_dm(ctx, ctx.author, content="Please enter your gender, type `m` for `male`, and `f` for `female`:")
 
         def check_gender(msg) -> bool:
-            value = msg.content
+            value = msg.content.lower()
             try:
                 return msg.author == ctx.author and type(msg.channel) == discord.channel.DMChannel and (
                     value == 'm' or value == 'f')
