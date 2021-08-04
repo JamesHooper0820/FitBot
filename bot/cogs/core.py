@@ -49,8 +49,9 @@ class Core(commands.Cog):
         embed.set_author(
             name="FitBot",
             icon_url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
-        
-        channel = guild.text_channels[0] # Could be a problem if bot doesn't have perms to that channel index 0
+
+        # Could be a problem if bot doesn't have perms to that channel index 0
+        channel = guild.text_channels[0]
         await channel.send(embed=embed)
 
     @commands.Cog.listener()
@@ -70,8 +71,8 @@ class Core(commands.Cog):
             self.activities_index = 0
 
     @cog_ext.cog_slash(name="initialize",
-    description="Initializes FitBot.",
-    guild_ids=[799768142045249606])
+                       description="Initializes FitBot.",
+                       guild_ids=[799768142045249606])
     async def initialize(self, ctx) -> None:
         await ctx.guild.create_role(name="Posture Check", mentionable=True, colour=discord.Colour(0x34e12f))
         await ctx.guild.create_role(name="Hydration Check", mentionable=True, colour=discord.Colour(0x45c7ea))
@@ -89,8 +90,14 @@ class Core(commands.Cog):
             name="Reactions",
             value="Click on the reactions to this message in order to access roles:",
             inline=False)
-        embed.add_field(name="\u200b", value="🧍 = Posture Checker Role", inline=False)
-        embed.add_field(name="\u200b", value="🚰 = Hydration Checker Role", inline=False)
+        embed.add_field(
+            name="\u200b",
+            value="🧍 = Posture Checker Role",
+            inline=False)
+        embed.add_field(
+            name="\u200b",
+            value="🚰 = Hydration Checker Role",
+            inline=False)
         embed.add_field(name="\u200b", value="\u200b", inline=False)
         embed.add_field(
             name="Help",
