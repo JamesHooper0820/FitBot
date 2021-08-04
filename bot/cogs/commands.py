@@ -25,7 +25,7 @@ class Commands(commands.Cog):
         "/workout - Random 5-piece workout\n"
         "/bmi - BMI calculator\n"
         "/calories - Calorie calculator\n"
-        "/help - Help command\n```")
+        "/help - Help command\n```", hidden=True)
 
     @commands.Cog.listener()
     async def get_quote(self) -> str:
@@ -40,7 +40,7 @@ class Commands(commands.Cog):
     guild_ids=[799768142045249606])
     async def quote(self, ctx) -> None:
         quote = await self.get_quote()
-        await ctx.send(ctx.author.mention + ' ' + quote)
+        await ctx.send(ctx.author.mention + ' ' + quote, hidden=True)
 
     @commands.Cog.listener()
     async def get_workout(self) -> list:
@@ -125,16 +125,16 @@ class Commands(commands.Cog):
                         str(r.choice(reps)) +
                         " reps", value=workouts[4], inline=False)
 
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, hidden=True)
 
     @cog_ext.cog_slash(name="bmi",
     description="BMI calculator.",
     guild_ids=[799768142045249606])
     async def bmi_calculator(self, ctx):
-        await ctx.send("Please note, the following information is **not** saved by FitBot.")
+        await ctx.send("Please note, the following information is **not** saved by FitBot.", hidden=True)
         await ctx.send("There are limitations of the BMI, such as it not being able to "
         "tell the difference between excess fat, muscle or bone. It also doesn't take into account "
-        "age, gender or muscle mass. Please don't use the BMI as a form of medical advice.")
+        "age, gender or muscle mass. Please don't use the BMI as a form of medical advice.", hidden=True)
         
         self.height = False
         self.weight = False
@@ -148,27 +148,27 @@ class Commands(commands.Cog):
             await self.weight_listener(ctx)
 
         bmi = float(self.weight_msg.content) / (float(self.height_msg.content)/100)**2
-        await ctx.send(ctx.author.mention + f" Your BMI (Body Mass Index) is `{bmi:.2f}`.")
+        await ctx.send(ctx.author.mention + f" Your BMI (Body Mass Index) is `{bmi:.2f}`.", hidden=True)
 
         if bmi <= 18.4:
-            await ctx.send("You are classed as `underweight`.")
+            await ctx.send("You are classed as `underweight`.", hidden=True)
         elif bmi <= 24.9:
-            await ctx.send("You are classed as `healthy`.")
+            await ctx.send("You are classed as `healthy`.", hidden=True)
         elif bmi <= 29.9:
-            await ctx.send("You are classed as `overweight`.")
+            await ctx.send("You are classed as `overweight`.", hidden=True)
         elif bmi <= 34.9:
-            await ctx.send("You are classed as `severely overweight`.")
+            await ctx.send("You are classed as `severely overweight`.", hidden=True)
         elif bmi <= 39.9:
-            await ctx.send("You are classed as `obese`.")
+            await ctx.send("You are classed as `obese`.", hidden=True)
         else:
-            await ctx.send("You are classed as `severely obese`.")
+            await ctx.send("You are classed as `severely obese`.", hidden=True)
 
-        await ctx.send("Don't worry if it's not what you want it to be, **you** can make the difference!")
+        await ctx.send("Don't worry if it's not what you want it to be, **you** can make the difference!", hidden=True)
 
 
     @commands.Cog.listener()
     async def height_listener(self, ctx) -> int:
-        await ctx.send("Please enter your height in `cm`:")
+        await ctx.send("Please enter your height in `cm`:", hidden=True)
 
         def check_height(msg) -> bool:
             value = msg.content
@@ -180,9 +180,9 @@ class Commands(commands.Cog):
 
         try:
             self.height_msg = await self.bot.wait_for("message", check=check_height, timeout=30)
-            await ctx.send(f"Height selected: `{self.height_msg.content}cm`.")
+            await ctx.send(f"Height selected: `{self.height_msg.content}cm`.", hidden=True)
         except asyncio.TimeoutError:
-            await ctx.send("Sorry, you didn't respond in time! Please enter your height.")
+            await ctx.send("Sorry, you didn't respond in time! Please enter your height.", hidden=True)
             self.height = False
             return self.height
         else:
@@ -192,7 +192,7 @@ class Commands(commands.Cog):
 
     @commands.Cog.listener()
     async def weight_listener(self, ctx) -> int:
-        await ctx.send("Please enter your weight in `kg`:")
+        await ctx.send("Please enter your weight in `kg`:", hidden=True)
 
         def check_weight(msg) -> bool:
             value = msg.content
@@ -204,9 +204,9 @@ class Commands(commands.Cog):
 
         try:
             self.weight_msg = await self.bot.wait_for("message", check=check_weight, timeout=30)
-            await ctx.send(f"Weight selected: `{self.weight_msg.content}kg`.")
+            await ctx.send(f"Weight selected: `{self.weight_msg.content}kg`.", hidden=True)
         except asyncio.TimeoutError:
-            await ctx.send("Sorry, you didn't respond in time! Please enter your weight.")
+            await ctx.send("Sorry, you didn't respond in time! Please enter your weight.", hidden=True)
             self.weight = False
             return self.weight
         else:
@@ -216,7 +216,7 @@ class Commands(commands.Cog):
 
     @commands.Cog.listener()
     async def age_listener(self, ctx) -> int:
-        await ctx.send("Please enter your age:")
+        await ctx.send("Please enter your age:", hidden=True)
 
         def check_age(msg) -> bool:
             value = msg.content
@@ -228,9 +228,9 @@ class Commands(commands.Cog):
 
         try:
             self.age_msg = await self.bot.wait_for("message", check=check_age, timeout=30)
-            await ctx.send(f"Age selected: `{self.age_msg.content}`.")
+            await ctx.send(f"Age selected: `{self.age_msg.content}`.", hidden=True)
         except asyncio.TimeoutError:
-            await ctx.send("Sorry, you didn't respond in time! Please enter your age.")
+            await ctx.send("Sorry, you didn't respond in time! Please enter your age.", hidden=True)
             self.age = False
             return self.age
         else:
@@ -240,7 +240,7 @@ class Commands(commands.Cog):
 
     @commands.Cog.listener()
     async def gender_listener(self, ctx) -> str:
-        await ctx.send("Please enter your gender, type `m` for `male`, and `f` for `female`:")
+        await ctx.send("Please enter your gender, type `m` for `male`, and `f` for `female`:", hidden=True)
 
         def check_gender(msg) -> bool:
             value = msg.content
@@ -253,15 +253,15 @@ class Commands(commands.Cog):
         try:
             self.gender_msg = await self.bot.wait_for("message", check=check_gender, timeout=30)
             if self.gender_msg.content.lower() == 'm':
-                await ctx.send("Gender selected: `Male`.")
+                await ctx.send("Gender selected: `Male`.", hidden=True)
             elif self.gender_msg.content.lower() == 'f':
-                await ctx.send("Gender selected: `Female`.")
+                await ctx.send("Gender selected: `Female`.", hidden=True)
             else:
-                await ctx.send("Invalid input, please try again.")
+                await ctx.send("Invalid input, please try again.", hidden=True)
                 self.gender = False
                 return self.gender
         except asyncio.TimeoutError:
-            await ctx.send("Sorry, you didn't respond in time! Please enter your gender.")
+            await ctx.send("Sorry, you didn't respond in time! Please enter your gender.", hidden=True)
             self.gender = False
             return self.gender
         else:
@@ -277,7 +277,7 @@ class Commands(commands.Cog):
         "`3` for Moderate: exercise 4-5 times/week\n"
         "`4` for Active: daily exercise or intense exercise 3-4 times/week\n"
         "`5` for Very Active: intense exercise 6-7 times/week\n"
-        "`6` for Extremely Active: very intense exercise daily\n")
+        "`6` for Extremely Active: very intense exercise daily\n", hidden=True)
 
         def check_activity(msg) -> bool:
             value = msg.content
@@ -291,23 +291,23 @@ class Commands(commands.Cog):
         try:
             self.activity_msg = await self.bot.wait_for("message", check=check_activity, timeout=30)
             if self.activity_msg.content.lower() == '1':
-                await ctx.send("Activity level selected: `Sedentary: little or no exercise`.")
+                await ctx.send("Activity level selected: `Sedentary: little or no exercise`.", hidden=True)
             elif self.activity_msg.content.lower() == '2':
-                await ctx.send("Activity level selected: `Light: exercise 1-3 times/week`.")
+                await ctx.send("Activity level selected: `Light: exercise 1-3 times/week`.", hidden=True)
             elif self.activity_msg.content.lower() == '3':
-                await ctx.send("Activity level selected: `Moderate: exercise 4-5 times/week`.")
+                await ctx.send("Activity level selected: `Moderate: exercise 4-5 times/week`.", hidden=True)
             elif self.activity_msg.content.lower() == '4':
-                await ctx.send("Activity level selected: `Active: daily exercise or intense exercise 3-4 times/week`.")
+                await ctx.send("Activity level selected: `Active: daily exercise or intense exercise 3-4 times/week`.", hidden=True)
             elif self.activity_msg.content.lower() == '5':
-                await ctx.send("Activity level selected: `Very Active: intense exercise 6-7 times/week`.")
+                await ctx.send("Activity level selected: `Very Active: intense exercise 6-7 times/week`.", hidden=True)
             elif self.activity_msg.content.lower() == '6':
-                await ctx.send("Activity level selected: `Extremely Active: very intense exercise daily`.")
+                await ctx.send("Activity level selected: `Extremely Active: very intense exercise daily`.", hidden=True)
             else:
-                await ctx.send("Invalid input, please try again.")
+                await ctx.send("Invalid input, please try again.", hidden=True)
                 self.activity = False
                 return self.activity
         except asyncio.TimeoutError:
-            await ctx.send("Sorry, you didn't respond in time! Please enter your activity level.")
+            await ctx.send("Sorry, you didn't respond in time! Please enter your activity level.", hidden=True)
             self.activity = False
             return self.activity
         else:
@@ -319,9 +319,9 @@ class Commands(commands.Cog):
     description="Calorie calculator.",
     guild_ids=[799768142045249606])
     async def calorie_calculator(self, ctx):
-        await ctx.send("Please note, the following information is **not** saved by FitBot.")
+        await ctx.send("Please note, the following information is **not** saved by FitBot.", hidden=True)
         await ctx.send("Don't use this calorie calculator as medical advice. "
-        "If you are unsure about your diet, please consult a professional dietician.")
+        "If you are unsure about your diet, please consult a professional dietician.", hidden=True)
 
         self.height = False
         self.weight = False
@@ -372,5 +372,5 @@ class Commands(commands.Cog):
             return
 
         await ctx.send(ctx.author.mention + f" Your Basal Metabolic Rate (BMR) is `{msj_equation:.0f}` calories. This is the "
-        "number of calories your body burns just to function properly.")
-        await ctx.send(f"To maintain your current weight, you should aim to consume `{total_calories:.0f}` calories per day.")
+        "number of calories your body burns just to function properly.", hidden=True)
+        await ctx.send(f"To maintain your current weight, you should aim to consume `{total_calories:.0f}` calories per day.", hidden=True)

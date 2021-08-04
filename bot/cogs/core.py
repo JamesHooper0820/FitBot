@@ -98,8 +98,8 @@ class Core(commands.Cog):
             inline=False)
 
         initial_message = await ctx.send(embed=embed)
-        await initial_message.add_reaction("🧍")
-        await initial_message.add_reaction("🚰")
+        await initial_message.add_reaction(emoji="🧍")
+        await initial_message.add_reaction(emoji="🚰")
 
         self.initialize_id = initial_message.id
 
