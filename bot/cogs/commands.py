@@ -15,7 +15,8 @@ class Commands(commands.Cog):
         self.bot = bot
 
     @cog_ext.cog_slash(name="help",
-    description="Help command.")
+    description="Help command.",
+    guild_ids=[799768142045249606])
     async def help(self, ctx) -> None:
         await ctx.send("```List of Commands:\n"
         "\n"
@@ -35,7 +36,8 @@ class Commands(commands.Cog):
         return random_quote
 
     @cog_ext.cog_slash(name="quote",
-    description="Random inspirational quote.")
+    description="Random inspirational quote.",
+    guild_ids=[799768142045249606])
     async def quote(self, ctx) -> None:
         quote = await self.get_quote()
         await ctx.send(ctx.author.mention + ' ' + quote)
@@ -52,7 +54,8 @@ class Commands(commands.Cog):
         return workouts
 
     @cog_ext.cog_slash(name="workout",
-    description="Random 5-piece workout.")
+    description="Random 5-piece workout.",
+    guild_ids=[799768142045249606])
     async def workout(self, ctx) -> None:
         workout = await self.get_workout()
         workouts = [
@@ -125,7 +128,8 @@ class Commands(commands.Cog):
         await ctx.send(embed=embed)
 
     @cog_ext.cog_slash(name="bmi",
-    description="BMI calculator.")
+    description="BMI calculator.",
+    guild_ids=[799768142045249606])
     async def bmi_calculator(self, ctx):
         await ctx.send("Please note, the following information is **not** saved by FitBot.")
         await ctx.send("There are limitations of the BMI, such as it not being able to "
@@ -312,7 +316,8 @@ class Commands(commands.Cog):
             return self.activity
 
     @cog_ext.cog_slash(name="calories",
-    description="Calorie calculator.")
+    description="Calorie calculator.",
+    guild_ids=[799768142045249606])
     async def calorie_calculator(self, ctx):
         await ctx.send("Please note, the following information is **not** saved by FitBot.")
         await ctx.send("Don't use this calorie calculator as medical advice. "

@@ -70,7 +70,8 @@ class Core(commands.Cog):
             self.activities_index = 0
 
     @cog_ext.cog_slash(name="initialize",
-    description="Initializes FitBot.")
+    description="Initializes FitBot.",
+    guild_ids=[799768142045249606])
     async def initialize(self, ctx) -> None:
         await ctx.guild.create_role(name="Posture Check", mentionable=True, colour=discord.Colour(0x34e12f))
         await ctx.guild.create_role(name="Hydration Check", mentionable=True, colour=discord.Colour(0x45c7ea))
