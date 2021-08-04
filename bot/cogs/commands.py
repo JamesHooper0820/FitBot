@@ -178,7 +178,7 @@ class Commands(commands.Cog):
         def check_height(msg) -> bool:
             value = msg.content
             try:
-                return msg.author == ctx.author and msg.channel == ctx.channel and \
+                return msg.author == ctx.author and type(msg.channel) == discord.channel.DMChannel and \
                     isinstance(float(value), float)
             except ValueError:
                 return False
@@ -202,7 +202,7 @@ class Commands(commands.Cog):
         def check_weight(msg) -> bool:
             value = msg.content
             try:
-                return msg.author == ctx.author and msg.channel == ctx.channel and \
+                return msg.author == ctx.author and type(msg.channel) == discord.channel.DMChannel and \
                     isinstance(float(value), float)
             except ValueError:
                 return False
@@ -226,7 +226,7 @@ class Commands(commands.Cog):
         def check_age(msg) -> bool:
             value = msg.content
             try:
-                return msg.author == ctx.author and msg.channel == ctx.channel and \
+                return msg.author == ctx.author and type(msg.channel) == discord.channel.DMChannel and \
                     isinstance(float(value), float)
             except ValueError:
                 return False
@@ -250,7 +250,7 @@ class Commands(commands.Cog):
         def check_gender(msg) -> bool:
             value = msg.content
             try:
-                return msg.author == ctx.author and msg.channel == ctx.channel and (
+                return msg.author == ctx.author and type(msg.channel) == discord.channel.DMChannel and (
                     value == 'm' or value == 'f')
             except ValueError:
                 return False
@@ -288,7 +288,7 @@ class Commands(commands.Cog):
             value = msg.content
             try:
                 valid_inputs = ['1', '2', '3', '4', '5', '6']
-                return msg.author == ctx.author and msg.channel == ctx.channel and (
+                return msg.author == ctx.author and type(msg.channel) == discord.channel.DMChannel and (
                     value in valid_inputs)
             except ValueError:
                 return False
