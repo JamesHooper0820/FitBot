@@ -38,20 +38,21 @@ class Commands(commands.Cog):
         )
         await ctx.send("List of Commands:", components=[create_actionrow(select)], hidden=True)
 
-        button_ctx: ComponentContext = await wait_for_component(self.bot, components=select)
-        if button_ctx.selected_options[0] == "initialize":
-            await self.core.initialize.invoke(button_ctx)
-        elif button_ctx.selected_options[0] == "quote":
-            await self.quote.invoke(button_ctx)
-        elif button_ctx.selected_options[0] == "workout":
-            await self.workout.invoke(button_ctx)
-        elif button_ctx.selected_options[0] == "bmi":
-            await self.bmi.invoke(button_ctx)
-        elif button_ctx.selected_options[0] == "calories":
-            await self.calorie_calculator.invoke(button_ctx)
-        elif button_ctx.selected_options[0] == "help":
-            await self.help.invoke(button_ctx)
-   
+        while True:
+            button_ctx: ComponentContext = await wait_for_component(self.bot, components=select)
+            if button_ctx.selected_options[0] == "initialize":
+                await self.core.initialize.invoke(button_ctx)
+            elif button_ctx.selected_options[0] == "quote":
+                await self.quote.invoke(button_ctx)
+            elif button_ctx.selected_options[0] == "workout":
+                await self.workout.invoke(button_ctx)
+            elif button_ctx.selected_options[0] == "bmi":
+                await self.bmi.invoke(button_ctx)
+            elif button_ctx.selected_options[0] == "calories":
+                await self.calorie_calculator.invoke(button_ctx)
+            elif button_ctx.selected_options[0] == "help":
+                await self.help.invoke(button_ctx)
+
 
     async def send_dm(self, ctx, member: discord.Member, *, content):
         channel = await member.create_dm()
