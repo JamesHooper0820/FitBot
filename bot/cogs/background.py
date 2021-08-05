@@ -6,9 +6,11 @@ from discord.ext.tasks import loop
 class Background(commands.Cog):
     """Initialize the background cog."""
 
+
     def __init__(self, bot) -> None:
         """Initialize the bot."""
         self.bot = bot
+
 
     @loop(hours=1)
     async def posture(self) -> None:
@@ -22,6 +24,7 @@ class Background(commands.Cog):
                     await m.send((m.mention + " Hourly posture check, fix your posture!"))
                 except discord.Forbidden:
                     pass
+
 
     @loop(hours=1)
     async def hydration(self) -> None:

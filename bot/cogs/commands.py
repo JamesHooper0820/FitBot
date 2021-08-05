@@ -5,31 +5,58 @@ import requests
 import json
 import random as r
 from discord_slash import cog_ext
+from discord_slash.utils.manage_components import *
+from .core import Core
 
 
 class Commands(commands.Cog):
     """Initialize the commands cog."""
 
+
     def __init__(self, bot) -> None:
         """Initialize the bot."""
         self.bot = bot
+        self.core = Core(bot)
+
 
     @cog_ext.cog_slash(name="help",
                        description="Help command.",
                        guild_ids=[799768142045249606])
     async def help(self, ctx) -> None:
-        await ctx.send("```List of Commands:\n"
-                       "\n"
-                       "/initialize - Initializes FitBot\n"
-                       "/quote - Random inspirational quote\n"
-                       "/workout - Random 5-piece workout\n"
-                       "/bmi - BMI calculator\n"
-                       "/calories - Calorie calculator\n"
-                       "/help - Help command\n```", hidden=True)
+        select = create_select(
+        options=[
+            create_select_option("/initialize", value="initialize", description="Initializes FitBot"),
+            create_select_option("/quote", value="quote", description="Random inspirational quote"),
+            create_select_option("/workout", value="workout", description="Random 5-piece workout"),
+            create_select_option("/bmi", value="bmi", description="BMI calculator"),
+            create_select_option("/calories", value="calories", description="Calorie calculator"),
+            create_select_option("/help", value="help", description="Help command"),
+        ],
+        placeholder="Select...",  # The placeholder text to show when no options have been chosen
+        min_values=1,  # The minimum number of options a user must select
+        max_values=1,  # The maximum number of options a user can select
+        )
+        await ctx.send("List of Commands:", components=[create_actionrow(select)], hidden=True)
+
+        button_ctx: ComponentContext = await wait_for_component(self.bot, components=select)
+        if button_ctx.selected_options[0] == "initialize":
+            await self.core.initialize.invoke(button_ctx)
+        elif button_ctx.selected_options[0] == "quote":
+            await self.quote.invoke(button_ctx)
+        elif button_ctx.selected_options[0] == "workout":
+            await self.workout.invoke(button_ctx)
+        elif button_ctx.selected_options[0] == "bmi":
+            await self.bmi.invoke(button_ctx)
+        elif button_ctx.selected_options[0] == "calories":
+            await self.calorie_calculator.invoke(button_ctx)
+        elif button_ctx.selected_options[0] == "help":
+            await self.help.invoke(button_ctx)
+   
 
     async def send_dm(self, ctx, member: discord.Member, *, content):
         channel = await member.create_dm()
         await channel.send(content)
+
 
     @commands.Cog.listener()
     async def get_quote(self) -> str:
@@ -39,12 +66,14 @@ class Commands(commands.Cog):
             json_data))]["text"] + " - " + json_data[r.randint(0, len(json_data))]["author"]
         return random_quote
 
+
     @cog_ext.cog_slash(name="quote",
                        description="Random inspirational quote.",
                        guild_ids=[799768142045249606])
     async def quote(self, ctx) -> None:
         quote = await self.get_quote()
         await ctx.send(ctx.author.mention + ' ' + quote, hidden=True)
+
 
     @commands.Cog.listener()
     async def get_workout(self) -> list:
@@ -56,6 +85,7 @@ class Commands(commands.Cog):
                             ": " + "\n" + json_data["results"][r.randint(0, len(json_data["results"]) - 3)]["description"])
             i += 1
         return workouts
+
 
     @cog_ext.cog_slash(name="workout",
                        description="Random 5-piece workout.",
@@ -131,6 +161,7 @@ class Commands(commands.Cog):
 
         await ctx.send(embed=embed, hidden=True)
 
+
     @cog_ext.cog_slash(name="bmi",
                        description="BMI calculator.",
                        guild_ids=[799768142045249606])
@@ -171,6 +202,7 @@ class Commands(commands.Cog):
 
         await self.send_dm(ctx, ctx.author, content="Don't worry if it's not what you want it to be, **you** can make the difference!")
 
+
     @commands.Cog.listener()
     async def height_listener(self, ctx) -> int:
         await self.send_dm(ctx, ctx.author, content="Please enter your height in `cm`:")
@@ -194,6 +226,7 @@ class Commands(commands.Cog):
             await self.height_msg.add_reaction("👍")
             self.height = True
             return self.height
+
 
     @commands.Cog.listener()
     async def weight_listener(self, ctx) -> int:
@@ -219,6 +252,7 @@ class Commands(commands.Cog):
             self.weight = True
             return self.weight
 
+
     @commands.Cog.listener()
     async def age_listener(self, ctx) -> int:
         await self.send_dm(ctx, ctx.author, content="Please enter your age:")
@@ -242,6 +276,7 @@ class Commands(commands.Cog):
             await self.age_msg.add_reaction("👍")
             self.age = True
             return self.age
+
 
     @commands.Cog.listener()
     async def gender_listener(self, ctx) -> str:
@@ -273,6 +308,7 @@ class Commands(commands.Cog):
             await self.gender_msg.add_reaction("👍")
             self.gender = True
             return self.gender
+
 
     @commands.Cog.listener()
     async def activity_listener(self, ctx) -> str:
@@ -319,6 +355,7 @@ class Commands(commands.Cog):
             await self.activity_msg.add_reaction("👍")
             self.activity = True
             return self.activity
+
 
     @cog_ext.cog_slash(name="calories",
                        description="Calorie calculator.",
