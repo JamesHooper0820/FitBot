@@ -9,7 +9,6 @@ from discord_slash import cog_ext
 class Core(commands.Cog):
     """Initialize the core cog."""
 
-
     def __init__(self, bot) -> None:
         """Initialize the bot."""
         self.bot = bot
@@ -27,7 +26,6 @@ class Core(commands.Cog):
                 name="your health",
                 type=discord.ActivityType.watching)]
 
-
     @commands.Cog.listener()
     async def on_ready(self) -> None:
         print(f"Logged in as {self.bot.user}.")
@@ -39,7 +37,6 @@ class Core(commands.Cog):
         self.background.posture.start()
         self.background.hydration.start()
         self.statuses.start()
-
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild) -> None:
@@ -57,13 +54,11 @@ class Core(commands.Cog):
         channel = guild.text_channels[0]
         await channel.send(embed=embed)
 
-
     @commands.Cog.listener()
     async def on_guild_remove(self, guild) -> None:
         self.background.posture.stop()
         self.background.hydration.stop()
         self.statuses.stop()
-
 
     @loop(seconds=10)
     async def statuses(self) -> None:
@@ -74,7 +69,6 @@ class Core(commands.Cog):
         self.activities_index += 1
         if self.activities_index >= len(self.activities):
             self.activities_index = 0
-
 
     @cog_ext.cog_slash(name="initialize",
                        description="Initializes FitBot.",
@@ -116,7 +110,6 @@ class Core(commands.Cog):
 
         self.initialize_id = initial_message.id
 
-
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: RawReactionActionEvent) -> None:
         if self.initialize_id != payload.message_id:
@@ -137,7 +130,6 @@ class Core(commands.Cog):
                 member = await self.guild.fetch_member(payload.user_id)
                 if member is not None:
                     await member.add_roles(role)
-
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload: RawReactionActionEvent) -> None:

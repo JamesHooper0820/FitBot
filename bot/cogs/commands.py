@@ -101,7 +101,6 @@ class Commands(commands.Cog):
             i += 1
         return workouts
 
-    # WIP
     @cog_ext.cog_slash(name="workout",
                        description="Random 5-piece workout.",
                        guild_ids=[799768142045249606])
@@ -200,7 +199,7 @@ class Commands(commands.Cog):
                         i += 1
                     except IndexError:
                         pass
-                    
+
                 elif button_ctx.component_id == "<<":
                     try:
                         embed.remove_field(2)
@@ -221,7 +220,6 @@ class Commands(commands.Cog):
                     await button_ctx.edit_origin(content="A new workout has been generated below.", embed=None, components=None, hidden=True)
                     await self.workout.invoke(button_ctx)
                     return
-
 
     @cog_ext.cog_slash(name="bmi",
                        description="BMI calculator.",
