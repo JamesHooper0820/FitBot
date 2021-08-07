@@ -92,18 +92,9 @@ class Core(commands.Cog):
             name="FitBot",
             icon_url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
         embed.add_field(
-            name="Reactions",
-            value="Click on the reactions to this message in order to access roles:",
+            name="Roles",
+            value="Click on the buttons below to access FitBot's roles.",
             inline=False)
-        embed.add_field(
-            name="\u200b",
-            value="🧍 = Posture Checker Role",
-            inline=False)
-        embed.add_field(
-            name="\u200b",
-            value="🚰 = Hydration Checker Role",
-            inline=False)
-        embed.add_field(name="\u200b", value="\u200b", inline=False)
         embed.add_field(
             name="Help",
             value="Use the `/help` command for assistance.",
@@ -144,7 +135,7 @@ class Core(commands.Cog):
             if button_ctx.component_id == "Posture Checker":
                 if self.posture_role is not None:
                     if self.posture_role in self.member.roles:
-                        pass
+                        await self.member.remove_roles(self.posture_role)
                     else:
                         try:
                             await self.member.add_roles(self.posture_role)
@@ -155,7 +146,7 @@ class Core(commands.Cog):
                 self.posture_role = discord.utils.get(self.guild.roles, name="Posture Check")
                 if self.hydration_role is not None:
                     if self.hydration_role in self.member.roles:
-                        pass
+                        await self.member.remove_roles(self.hydration_role)
                     else:
                         try:
                             await self.member.add_roles(self.hydration_role)
