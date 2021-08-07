@@ -6,58 +6,74 @@ import json
 import random as r
 from discord_slash import cog_ext
 from discord_slash.utils.manage_components import *
+from discord_slash.model import ButtonStyle
 from .core import Core
 
 
 class Commands(commands.Cog):
     """Initialize the commands cog."""
 
-
     def __init__(self, bot) -> None:
         """Initialize the bot."""
         self.bot = bot
         self.core = Core(bot)
-
 
     @cog_ext.cog_slash(name="help",
                        description="Help command.",
                        guild_ids=[799768142045249606])
     async def help(self, ctx) -> None:
         select = create_select(
-        options=[
-            create_select_option("/initialize", value="initialize", description="Initializes FitBot"),
-            create_select_option("/quote", value="quote", description="Random inspirational quote"),
-            create_select_option("/workout", value="workout", description="Random 5-piece workout"),
-            create_select_option("/bmi", value="bmi", description="BMI calculator"),
-            create_select_option("/calories", value="calories", description="Calorie calculator"),
-            create_select_option("/help", value="help", description="Help command"),
-        ],
-        placeholder="Select...",  # The placeholder text to show when no options have been chosen
-        min_values=1,  # The minimum number of options a user must select
-        max_values=1,  # The maximum number of options a user can select
+            options=[
+                create_select_option(
+                    "/initialize",
+                    value="initialize",
+                    description="Initializes FitBot"),
+                create_select_option(
+                    "/quote",
+                    value="quote",
+                    description="Random inspirational quote"),
+                create_select_option(
+                    "/workout",
+                    value="workout",
+                    description="Random 5-piece workout"),
+                create_select_option(
+                    "/bmi", value="bmi", description="BMI calculator"),
+                create_select_option(
+                    "/calories",
+                    value="calories",
+                    description="Calorie calculator"),
+                create_select_option(
+                    "/help", value="help", description="Help command"),
+            ],
+            placeholder="Select...",
+            # The placeholder text to show when no options have been chosen
+            min_values=1,  # The minimum number of options a user must select
+            max_values=1,  # The maximum number of options a user can select
         )
         await ctx.send("List of Commands:", components=[create_actionrow(select)], hidden=True)
 
         while True:
-            button_ctx: ComponentContext = await wait_for_component(self.bot, components=select)
-            if button_ctx.selected_options[0] == "initialize":
-                await self.core.initialize.invoke(button_ctx)
-            elif button_ctx.selected_options[0] == "quote":
-                await self.quote.invoke(button_ctx)
-            elif button_ctx.selected_options[0] == "workout":
-                await self.workout.invoke(button_ctx)
-            elif button_ctx.selected_options[0] == "bmi":
-                await self.bmi.invoke(button_ctx)
-            elif button_ctx.selected_options[0] == "calories":
-                await self.calorie_calculator.invoke(button_ctx)
-            elif button_ctx.selected_options[0] == "help":
-                await self.help.invoke(button_ctx)
+            select_ctx: ComponentContext = await wait_for_component(self.bot, components=select)
 
+            if select_ctx.channel != ctx.channel:
+                return
+            if select_ctx.channel == ctx.channel:
+                if select_ctx.selected_options[0] == "initialize":
+                    await self.core.initialize.invoke(select_ctx)
+                elif select_ctx.selected_options[0] == "quote":
+                    await self.quote.invoke(select_ctx)
+                elif select_ctx.selected_options[0] == "workout":
+                    await self.workout.invoke(select_ctx)
+                elif select_ctx.selected_options[0] == "bmi":
+                    await self.bmi.invoke(select_ctx)
+                elif select_ctx.selected_options[0] == "calories":
+                    await self.calorie_calculator.invoke(select_ctx)
+                elif select_ctx.selected_options[0] == "help":
+                    await self.help.invoke(select_ctx)
 
     async def send_dm(self, ctx, member: discord.Member, *, content):
         channel = await member.create_dm()
         await channel.send(content)
-
 
     @commands.Cog.listener()
     async def get_quote(self) -> str:
@@ -67,7 +83,6 @@ class Commands(commands.Cog):
             json_data))]["text"] + " - " + json_data[r.randint(0, len(json_data))]["author"]
         return random_quote
 
-
     @cog_ext.cog_slash(name="quote",
                        description="Random inspirational quote.",
                        guild_ids=[799768142045249606])
@@ -75,23 +90,41 @@ class Commands(commands.Cog):
         quote = await self.get_quote()
         await ctx.send(ctx.author.mention + ' ' + quote, hidden=True)
 
-
     @commands.Cog.listener()
     async def get_workout(self) -> list:
         response = requests.get("https://wger.de/api/v2/exercise/?language=2")
         json_data = json.loads(response.text)
         workouts = []
         for i in range(5):
-            workouts.append(json_data["results"][r.randint(0, len(json_data["results"]) - 3)]["name"] +
+            workouts.append(json_data["results"][r.randint(0, len(json_data["results"]) - 3)]["name"] + \
                             ": " + "\n" + json_data["results"][r.randint(0, len(json_data["results"]) - 3)]["description"])
             i += 1
         return workouts
 
-
+    # WIP
     @cog_ext.cog_slash(name="workout",
                        description="Random 5-piece workout.",
                        guild_ids=[799768142045249606])
     async def workout(self, ctx) -> None:
+        buttons = [
+            create_button(
+                style=ButtonStyle.green,
+                label="<<",
+                custom_id="<<"
+            ),
+            create_button(
+                style=ButtonStyle.blue,
+                label="Generate New Workout",
+                custom_id="Generate New Workout"
+            ),
+            create_button(
+                style=ButtonStyle.green,
+                label=">>",
+                custom_id=">>"
+            ),
+        ]
+        action_row = create_actionrow(*buttons)
+
         workout = await self.get_workout()
         workouts = [
             w.replace(
@@ -101,15 +134,19 @@ class Commands(commands.Cog):
                 "").replace(
                 "<ul>",
                 "").replace(
-                    "</ul>",
-                    "").replace(
-                        "<li>",
-                        "").replace(
-                            "</li>",
-                            "").replace(
-                                "<ol>",
-                                "").replace(
-                                    "</ol>",
+                "</ul>",
+                "").replace(
+                "<em>",
+                "").replace(
+                "</em>",
+                "").replace(
+                "<li>",
+                "").replace(
+                "</li>",
+                "").replace(
+                "<ol>",
+                "").replace(
+                "</ol>",
                 "") for w in workout]
 
         sets = [1, 2, 3]
@@ -117,7 +154,7 @@ class Commands(commands.Cog):
 
         embed = discord.Embed(
             title="Quick Workout",
-            description="Below is a list of 5 exercises for you to do, good luck.",
+            description="The following is a set of 5 exercises, please use the arrows to move between exercise, good luck.",
             colour=discord.Color.blue())
 
         embed.set_footer(text="Stay healthy!")
@@ -135,32 +172,55 @@ class Commands(commands.Cog):
                         "x" +
                         str(r.choice(reps)) +
                         " reps", value=workouts[0], inline=False)
-        embed.add_field(name="Exercise 2 " +
-                        "- " +
-                        str(r.choice(sets)) +
-                        "x" +
-                        str(r.choice(reps)) +
-                        " reps", value=workouts[1], inline=False)
-        embed.add_field(name="Exercise 3 " +
-                        "- " +
-                        str(r.choice(sets)) +
-                        "x" +
-                        str(r.choice(reps)) +
-                        " reps", value=workouts[2], inline=False)
-        embed.add_field(name="Exercise 4 " +
-                        "- " +
-                        str(r.choice(sets)) +
-                        "x" +
-                        str(r.choice(reps)) +
-                        " reps", value=workouts[3], inline=False)
-        embed.add_field(name="Exercise 5 " +
-                        "- " +
-                        str(r.choice(sets)) +
-                        "x" +
-                        str(r.choice(reps)) +
-                        " reps", value=workouts[4], inline=False)
 
-        await ctx.send(embed=embed, hidden=True)
+        await ctx.send(embed=embed, components=[action_row], hidden=True)
+
+        workout_queue = []
+        i = 1
+        while True:
+            button_ctx: ComponentContext = await wait_for_component(self.bot, components=[action_row])
+
+            if button_ctx.channel != ctx.channel:
+                return
+            if button_ctx.channel == ctx.channel:
+
+                if button_ctx.component_id == ">>":
+                    try:
+                        embed.remove_field(2)
+
+                        workout_queue.append(workouts[i - 1])
+
+                        embed.add_field(name=f"Exercise {i + 1} " +
+                                        "- " +
+                                        str(r.choice(sets)) +
+                                        "x" +
+                                        str(r.choice(reps)) +
+                                        " reps", value=workouts[i], inline=False)
+                        await button_ctx.edit_origin(embed=embed, components=[action_row], hidden=True)
+                        i += 1
+                    except IndexError:
+                        pass
+                    
+                elif button_ctx.component_id == "<<":
+                    try:
+                        embed.remove_field(2)
+
+                        embed.add_field(name=f"Exercise {i - 1} " +
+                                        "- " +
+                                        str(r.choice(sets)) +
+                                        "x" +
+                                        str(r.choice(reps)) +
+                                        " reps", value=workout_queue[i - 2], inline=False)
+                        await button_ctx.edit_origin(embed=embed, components=[action_row], hidden=True)
+                        workout_queue.pop(i - 2)
+                        i -= 1
+                    except IndexError:
+                        pass
+
+                elif button_ctx.component_id == "Generate New Workout":
+                    await button_ctx.edit_origin(content="A new workout has been generated below.", embed=None, components=None, hidden=True)
+                    await self.workout.invoke(button_ctx)
+                    return
 
 
     @cog_ext.cog_slash(name="bmi",
@@ -203,7 +263,6 @@ class Commands(commands.Cog):
 
         await self.send_dm(ctx, ctx.author, content="Don't worry if it's not what you want it to be, **you** can make the difference!")
 
-
     @commands.Cog.listener()
     async def height_listener(self, ctx) -> int:
         await self.send_dm(ctx, ctx.author, content="Please enter your height in `cm`:")
@@ -211,8 +270,9 @@ class Commands(commands.Cog):
         def check_height(msg) -> bool:
             value = msg.content
             try:
-                return msg.author == ctx.author and type(msg.channel) == discord.channel.DMChannel and \
-                    isinstance(float(value), float)
+                return msg.author == ctx.author and isinstance(
+                    msg.channel, discord.channel.DMChannel) and isinstance(
+                    float(value), float)
             except ValueError:
                 return False
 
@@ -228,7 +288,6 @@ class Commands(commands.Cog):
             self.height = True
             return self.height
 
-
     @commands.Cog.listener()
     async def weight_listener(self, ctx) -> int:
         await self.send_dm(ctx, ctx.author, content="Please enter your weight in `kg`:")
@@ -236,8 +295,9 @@ class Commands(commands.Cog):
         def check_weight(msg) -> bool:
             value = msg.content
             try:
-                return msg.author == ctx.author and type(msg.channel) == discord.channel.DMChannel and \
-                    isinstance(float(value), float)
+                return msg.author == ctx.author and isinstance(
+                    msg.channel, discord.channel.DMChannel) and isinstance(
+                    float(value), float)
             except ValueError:
                 return False
 
@@ -253,7 +313,6 @@ class Commands(commands.Cog):
             self.weight = True
             return self.weight
 
-
     @commands.Cog.listener()
     async def age_listener(self, ctx) -> int:
         await self.send_dm(ctx, ctx.author, content="Please enter your age:")
@@ -261,8 +320,9 @@ class Commands(commands.Cog):
         def check_age(msg) -> bool:
             value = msg.content
             try:
-                return msg.author == ctx.author and type(msg.channel) == discord.channel.DMChannel and \
-                    isinstance(float(value), float)
+                return msg.author == ctx.author and isinstance(
+                    msg.channel, discord.channel.DMChannel) and isinstance(
+                    float(value), float)
             except ValueError:
                 return False
 
@@ -278,7 +338,6 @@ class Commands(commands.Cog):
             self.age = True
             return self.age
 
-
     @commands.Cog.listener()
     async def gender_listener(self, ctx) -> str:
         await self.send_dm(ctx, ctx.author, content="Please enter your gender, type `m` for `male`, and `f` for `female`:")
@@ -286,7 +345,8 @@ class Commands(commands.Cog):
         def check_gender(msg) -> bool:
             value = msg.content.lower()
             try:
-                return msg.author == ctx.author and type(msg.channel) == discord.channel.DMChannel and (
+                return msg.author == ctx.author and isinstance(
+                    msg.channel, discord.channel.DMChannel) and (
                     value == 'm' or value == 'f')
             except ValueError:
                 return False
@@ -310,7 +370,6 @@ class Commands(commands.Cog):
             self.gender = True
             return self.gender
 
-
     @commands.Cog.listener()
     async def activity_listener(self, ctx) -> str:
         await self.send_dm(ctx, ctx.author, content="Please enter your activity level, type:\n"
@@ -325,7 +384,8 @@ class Commands(commands.Cog):
             value = msg.content
             try:
                 valid_inputs = ['1', '2', '3', '4', '5', '6']
-                return msg.author == ctx.author and type(msg.channel) == discord.channel.DMChannel and (
+                return msg.author == ctx.author and isinstance(
+                    msg.channel, discord.channel.DMChannel) and (
                     value in valid_inputs)
             except ValueError:
                 return False
@@ -356,7 +416,6 @@ class Commands(commands.Cog):
             await self.activity_msg.add_reaction("👍")
             self.activity = True
             return self.activity
-
 
     @cog_ext.cog_slash(name="calories",
                        description="Calorie calculator.",

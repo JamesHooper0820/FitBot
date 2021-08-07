@@ -23,6 +23,7 @@ load_dotenv(dotenv_path)
 bot.run(os.environ.get("TOKEN"))
 
 # TO DO:
+# Add 'New Workout' button to workout command, split it up for 1 workout per embed, the edit embed when '>>' button is clicked
 # Discord Buttons & Dropdowns - Improve flow of bot
 # Weekly Calorie Tracker - Tracks last 7 days of calorie inputs, with 7-day average
 # EOD Summary - Total calories and water that day
@@ -31,3 +32,4 @@ bot.run(os.environ.get("TOKEN"))
 # Logging
 # FitBit Integration
 # Strava Integration
+# Turn off Debug Mode in Django settings.py
