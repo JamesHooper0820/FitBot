@@ -33,6 +33,8 @@ class Core(commands.Cog):
         print(f"Logged in as {self.bot.user}.")
 
         for guild in self.bot.guilds:
+            print(f"Connected to {guild} (id: {guild.id}).")
+
             members = await guild.fetch_members(limit=None).flatten()
             self.sum += len(members)
 
