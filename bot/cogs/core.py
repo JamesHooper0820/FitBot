@@ -1,10 +1,7 @@
-from logging import exception
 import discord
-from discord.enums import NotificationLevel
 from discord.errors import HTTPException
 from discord.ext import commands
 from discord.ext.tasks import loop
-from discord.raw_models import RawReactionActionEvent
 from .background import Background
 from discord_slash import cog_ext
 from discord_slash.utils.manage_components import *
@@ -55,7 +52,7 @@ class Core(commands.Cog):
             name="FitBot",
             icon_url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
 
-        # Could be a problem if bot doesn't have perms to that channel index 0
+        # BUG: Could be a problem if bot doesn't have perms to that channel index 0
         channel = guild.text_channels[0]
         await channel.send(embed=embed)
 
@@ -132,29 +129,38 @@ class Core(commands.Cog):
             self.posture_role = discord.utils.get(self.guild.roles, name="Posture Check")
             self.hydration_role = discord.utils.get(self.guild.roles, name="Hydration Check")
 
-            if button_ctx.component_id == "Posture Checker":
+            if button_ctx.custom_id == "Posture Checker":
                 if self.posture_role is not None:
                     if self.posture_role in self.member.roles:
+                        await button_ctx.defer(hidden=True)
                         await self.member.remove_roles(self.posture_role)
+                        await button_ctx.send(button_ctx.author.mention + " `Posture Checker` role successfully **removed**.", hidden=True)
                     else:
                         try:
+                            await button_ctx.defer(hidden=True)
                             await self.member.add_roles(self.posture_role)
+                            await button_ctx.send(button_ctx.author.mention + " `Posture Checker` role successfully **added**.", hidden=True)
                         except HTTPException:
                             pass
 
-            elif button_ctx.component_id == "Hydration Checker":
+            elif button_ctx.custom_id == "Hydration Checker":
                 self.posture_role = discord.utils.get(self.guild.roles, name="Posture Check")
                 if self.hydration_role is not None:
                     if self.hydration_role in self.member.roles:
+                        await button_ctx.defer(hidden=True)
                         await self.member.remove_roles(self.hydration_role)
+                        await button_ctx.send(button_ctx.author.mention + " `Hydration Checker` role successfully **removed**.", hidden=True)
                     else:
                         try:
+                            await button_ctx.defer(hidden=True)
                             await self.member.add_roles(self.hydration_role)
+                            await button_ctx.send(button_ctx.author.mention + " `Hydration Checker` role successfully **added**.", hidden=True)
                         except HTTPException:
                             pass
 
-            elif button_ctx.component_id == "Reset FitBot Roles":
+            elif button_ctx.custom_id == "Reset FitBot Roles":
                 try:
                     await self.member.remove_roles(self.posture_role, self.hydration_role)
+                    await button_ctx.send(button_ctx.author.mention + " Sucessfully **removed** all FitBot roles.", hidden=True)
                 except HTTPException:
                     pass

@@ -20,7 +20,7 @@ class Commands(commands.Cog):
 
     @cog_ext.cog_slash(name="help",
                        description="Help command.",
-                       guild_ids=[799768142045249606])
+                       guild_ids=[799768142045249606, 873664168685883422])
     async def help(self, ctx) -> None:
         select = create_select(
             options=[
@@ -88,7 +88,7 @@ class Commands(commands.Cog):
 
     @cog_ext.cog_slash(name="quote",
                        description="Random inspirational quote.",
-                       guild_ids=[799768142045249606])
+                       guild_ids=[799768142045249606, 873664168685883422])
     async def quote(self, ctx) -> None:
         quote = await self.get_quote()
         await ctx.send(ctx.author.mention + ' ' + quote, hidden=True)
@@ -106,7 +106,7 @@ class Commands(commands.Cog):
 
     @cog_ext.cog_slash(name="workout",
                        description="Random 5-piece workout.",
-                       guild_ids=[799768142045249606])
+                       guild_ids=[799768142045249606, 873664168685883422])
     async def workout(self, ctx) -> None:
         buttons = [
             create_button(
@@ -184,7 +184,7 @@ class Commands(commands.Cog):
 
             button_ctx: ComponentContext = await wait_for_component(self.bot, check=check_ctx, components=[action_row])
 
-            if button_ctx.component_id == ">>":
+            if button_ctx.custom_id == ">>":
                 try:
                     if i >= 5:
                         i = 1
@@ -210,7 +210,7 @@ class Commands(commands.Cog):
                 except IndexError:
                     pass
 
-            elif button_ctx.component_id == "<<":
+            elif button_ctx.custom_id == "<<":
                 try:
                     if i <= 1:
                         i = 5
@@ -236,14 +236,14 @@ class Commands(commands.Cog):
                 except IndexError:
                     pass
 
-            elif button_ctx.component_id == "Generate New Workout":
+            elif button_ctx.custom_id == "Generate New Workout":
                 await button_ctx.edit_origin(content="A new workout has been generated below.", embed=None, components=None, hidden=True)
                 await self.workout.invoke(button_ctx)
                 return
 
     @cog_ext.cog_slash(name="bmi",
                        description="BMI calculator.",
-                       guild_ids=[799768142045249606])
+                       guild_ids=[799768142045249606, 873664168685883422])
     async def bmi_calculator(self, ctx):
         await ctx.send(ctx.author.mention + " Please visit your DM's to enter the information safely and securely.", hidden=True)
         await self.send_dm(ctx, ctx.author, content="Please note, the following information is **not** saved by FitBot.")
@@ -437,7 +437,7 @@ class Commands(commands.Cog):
 
     @cog_ext.cog_slash(name="calories",
                        description="Calorie calculator.",
-                       guild_ids=[799768142045249606])
+                       guild_ids=[799768142045249606, 873664168685883422])
     async def calorie_calculator(self, ctx):
         await ctx.send(ctx.author.mention + " Please visit your DM's to enter the information safely and securely.", hidden=True)
         await self.send_dm(ctx, ctx.author, content="Please note, the following information is **not** saved by FitBot.")
