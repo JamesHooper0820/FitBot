@@ -32,8 +32,8 @@ class Core(commands.Cog):
     async def on_ready(self) -> None:
         print(f"Logged in as {self.bot.user}.")
 
-        for self.guild in self.bot.guilds:
-            members = await self.guild.fetch_members(limit=None).flatten()
+        for guild in self.bot.guilds:
+            members = await guild.fetch_members(limit=None).flatten()
             self.sum += len(members)
 
         self.background.posture.start()
@@ -122,12 +122,13 @@ class Core(commands.Cog):
 
         while True:
             def check_ctx(button_ctx):
-                return ctx.author_id == button_ctx.author_id and ctx.channel == button_ctx.channel
+                return ctx.channel == button_ctx.channel
 
             button_ctx: ComponentContext = await wait_for_component(self.bot, check=check_ctx, components=[action_row])
-            self.member = await self.guild.fetch_member(button_ctx.author_id)
-            self.posture_role = discord.utils.get(self.guild.roles, name="Posture Check")
-            self.hydration_role = discord.utils.get(self.guild.roles, name="Hydration Check")
+
+            self.member = await button_ctx.guild.fetch_member(button_ctx.author_id)
+            self.posture_role = discord.utils.get(button_ctx.guild.roles, name="Posture Check")
+            self.hydration_role = discord.utils.get(button_ctx.guild.roles, name="Hydration Check")
 
             if button_ctx.custom_id == "Posture Checker":
                 if self.posture_role is not None:
@@ -144,7 +145,7 @@ class Core(commands.Cog):
                             pass
 
             elif button_ctx.custom_id == "Hydration Checker":
-                self.posture_role = discord.utils.get(self.guild.roles, name="Posture Check")
+                self.posture_role = discord.utils.get(button_ctx.guild.roles, name="Posture Check")
                 if self.hydration_role is not None:
                     if self.hydration_role in self.member.roles:
                         await button_ctx.defer(hidden=True)
