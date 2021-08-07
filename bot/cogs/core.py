@@ -1,9 +1,14 @@
+from logging import exception
 import discord
+from discord.enums import NotificationLevel
+from discord.errors import HTTPException
 from discord.ext import commands
 from discord.ext.tasks import loop
 from discord.raw_models import RawReactionActionEvent
 from .background import Background
 from discord_slash import cog_ext
+from discord_slash.utils.manage_components import *
+from discord_slash.model import ButtonStyle
 
 
 class Core(commands.Cog):
@@ -72,7 +77,7 @@ class Core(commands.Cog):
 
     @cog_ext.cog_slash(name="initialize",
                        description="Initializes FitBot.",
-                       guild_ids=[799768142045249606])
+                       guild_ids=[799768142045249606, 873664168685883422])
     async def initialize(self, ctx) -> None:
         await ctx.guild.create_role(name="Posture Check", mentionable=True, colour=discord.Colour(0x34e12f))
         await ctx.guild.create_role(name="Hydration Check", mentionable=True, colour=discord.Colour(0x45c7ea))
@@ -104,50 +109,61 @@ class Core(commands.Cog):
             value="Use the `/help` command for assistance.",
             inline=False)
 
-        initial_message = await ctx.send(embed=embed)
-        await initial_message.add_reaction(emoji="🧍")
-        await initial_message.add_reaction(emoji="🚰")
+        buttons = [
+            create_button(
+                style=ButtonStyle.green,
+                label="Posture Checker",
+                custom_id="Posture Checker",
+                emoji="🧍"
+            ),
+            create_button(
+                style=ButtonStyle.green,
+                label="Hydration Checker",
+                custom_id="Hydration Checker",
+                emoji="🚰"
+            ),
+            create_button(
+                style=ButtonStyle.red,
+                label="Reset FitBot Roles",
+                custom_id="Reset FitBot Roles"
+            ),
+        ]
+        action_row = create_actionrow(*buttons)
 
-        self.initialize_id = initial_message.id
+        await ctx.send(embed=embed, components=[action_row])
 
-    @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload: RawReactionActionEvent) -> None:
-        if self.initialize_id != payload.message_id:
-            return
-        if payload.user_id == self.bot.user.id:
-            return
-        emoji = payload.emoji.name
+        while True:
+            def check_ctx(button_ctx):
+                return ctx.author_id == button_ctx.author_id and ctx.channel == button_ctx.channel
 
-        if emoji == '🧍':
-            role = discord.utils.get(self.guild.roles, name="Posture Check")
-            if role is not None:
-                member = await self.guild.fetch_member(payload.user_id)
-                if member is not None:
-                    await member.add_roles(role)
-        if emoji == '🚰':
-            role = discord.utils.get(self.guild.roles, name="Hydration Check")
-            if role is not None:
-                member = await self.guild.fetch_member(payload.user_id)
-                if member is not None:
-                    await member.add_roles(role)
+            button_ctx: ComponentContext = await wait_for_component(self.bot, check=check_ctx, components=[action_row])
+            self.member = await self.guild.fetch_member(button_ctx.author_id)
+            self.posture_role = discord.utils.get(self.guild.roles, name="Posture Check")
+            self.hydration_role = discord.utils.get(self.guild.roles, name="Hydration Check")
 
-    @commands.Cog.listener()
-    async def on_raw_reaction_remove(self, payload: RawReactionActionEvent) -> None:
-        if self.initialize_id != payload.message_id:
-            return
-        if payload.user_id == self.bot.user.id:
-            return
-        emoji = payload.emoji.name
+            if button_ctx.component_id == "Posture Checker":
+                if self.posture_role is not None:
+                    if self.posture_role in self.member.roles:
+                        pass
+                    else:
+                        try:
+                            await self.member.add_roles(self.posture_role)
+                        except HTTPException:
+                            pass
 
-        if emoji == '🧍':
-            role = discord.utils.get(self.guild.roles, name="Posture Check")
-            if role is not None:
-                member = await self.guild.fetch_member(payload.user_id)
-                if member is not None:
-                    await member.remove_roles(role)
-        if emoji == '🚰':
-            role = discord.utils.get(self.guild.roles, name="Hydration Check")
-            if role is not None:
-                member = await self.guild.fetch_member(payload.user_id)
-                if member is not None:
-                    await member.remove_roles(role)
+            elif button_ctx.component_id == "Hydration Checker":
+                self.posture_role = discord.utils.get(self.guild.roles, name="Posture Check")
+                if self.hydration_role is not None:
+                    if self.hydration_role in self.member.roles:
+                        pass
+                    else:
+                        try:
+                            await self.member.add_roles(self.hydration_role)
+                        except HTTPException:
+                            pass
+
+            elif button_ctx.component_id == "Reset FitBot Roles":
+                try:
+                    await self.member.remove_roles(self.posture_role, self.hydration_role)
+                except HTTPException:
+                    pass

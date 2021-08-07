@@ -53,7 +53,10 @@ class Commands(commands.Cog):
         await ctx.send("List of Commands:", components=[create_actionrow(select)], hidden=True)
 
         while True:
-            select_ctx: ComponentContext = await wait_for_component(self.bot, components=select)
+            def check_ctx(button_ctx):
+                return ctx.author_id == button_ctx.author_id and ctx.channel == button_ctx.channel
+
+            select_ctx: ComponentContext = await wait_for_component(self.bot, check=check_ctx, components=select)
 
             if select_ctx.channel != ctx.channel:
                 return
@@ -176,69 +179,67 @@ class Commands(commands.Cog):
 
         i = 1
         while True:
-            button_ctx: ComponentContext = await wait_for_component(self.bot, components=[action_row])
+            def check_ctx(button_ctx):
+                return ctx.author_id == button_ctx.author_id and ctx.channel == button_ctx.channel
 
-            if button_ctx.channel != ctx.channel:
+            button_ctx: ComponentContext = await wait_for_component(self.bot, check=check_ctx, components=[action_row])
+
+            if button_ctx.component_id == ">>":
+                try:
+                    if i >= 5:
+                        i = 1
+                        embed.remove_field(2)
+                        embed.add_field(name="Exercise 1 " +
+                                        "- " +
+                                        str(r.choice(sets)) +
+                                        "x" +
+                                        str(r.choice(reps)) +
+                                        " reps", value=workouts[i - 1], inline=False)
+                        await button_ctx.edit_origin(embed=embed, components=[action_row], hidden=True)
+
+                    else:
+                        embed.remove_field(2)
+                        embed.add_field(name=f"Exercise {i + 1} " +
+                                        "- " +
+                                        str(r.choice(sets)) +
+                                        "x" +
+                                        str(r.choice(reps)) +
+                                        " reps", value=workouts[i], inline=False)
+                        await button_ctx.edit_origin(embed=embed, components=[action_row], hidden=True)
+                        i += 1
+                except IndexError:
+                    pass
+
+            elif button_ctx.component_id == "<<":
+                try:
+                    if i <= 1:
+                        i = 5
+                        embed.remove_field(2)
+                        embed.add_field(name="Exercise 5 " +
+                                        "- " +
+                                        str(r.choice(sets)) +
+                                        "x" +
+                                        str(r.choice(reps)) +
+                                        " reps", value=workouts[i - 1], inline=False)
+                        await button_ctx.edit_origin(embed=embed, components=[action_row], hidden=True)
+                    else:
+                        embed.remove_field(2)
+
+                        embed.add_field(name=f"Exercise {i - 1} " +
+                                        "- " +
+                                        str(r.choice(sets)) +
+                                        "x" +
+                                        str(r.choice(reps)) +
+                                        " reps", value=workouts[i - 2], inline=False)
+                        await button_ctx.edit_origin(embed=embed, components=[action_row], hidden=True)
+                        i -= 1
+                except IndexError:
+                    pass
+
+            elif button_ctx.component_id == "Generate New Workout":
+                await button_ctx.edit_origin(content="A new workout has been generated below.", embed=None, components=None, hidden=True)
+                await self.workout.invoke(button_ctx)
                 return
-            if button_ctx.channel == ctx.channel:
-
-                if button_ctx.component_id == ">>":
-                    try:
-                        if i >= 5:
-                            i = 1
-
-                            embed.remove_field(2)
-                            embed.add_field(name="Exercise 1 " +
-                                            "- " +
-                                            str(r.choice(sets)) +
-                                            "x" +
-                                            str(r.choice(reps)) +
-                                            " reps", value=workouts[i - 1], inline=False)
-                            await button_ctx.edit_origin(embed=embed, components=[action_row], hidden=True)
-                            
-                        else:
-                            embed.remove_field(2)
-                            embed.add_field(name=f"Exercise {i + 1} " +
-                                            "- " +
-                                            str(r.choice(sets)) +
-                                            "x" +
-                                            str(r.choice(reps)) +
-                                            " reps", value=workouts[i], inline=False)
-                            await button_ctx.edit_origin(embed=embed, components=[action_row], hidden=True)
-                            i += 1
-                    except IndexError:
-                        pass
-
-                elif button_ctx.component_id == "<<":
-                    try:
-                        if i <= 1:
-                            i = 5
-                            embed.remove_field(2)
-                            embed.add_field(name="Exercise 5 " +
-                                            "- " +
-                                            str(r.choice(sets)) +
-                                            "x" +
-                                            str(r.choice(reps)) +
-                                            " reps", value=workouts[i - 1], inline=False)
-                            await button_ctx.edit_origin(embed=embed, components=[action_row], hidden=True)
-                        else:
-                            embed.remove_field(2)
-
-                            embed.add_field(name=f"Exercise {i - 1} " +
-                                            "- " +
-                                            str(r.choice(sets)) +
-                                            "x" +
-                                            str(r.choice(reps)) +
-                                            " reps", value=workouts[i - 2], inline=False)
-                            await button_ctx.edit_origin(embed=embed, components=[action_row], hidden=True)
-                            i -= 1
-                    except IndexError:
-                        pass
-
-                elif button_ctx.component_id == "Generate New Workout":
-                    await button_ctx.edit_origin(content="A new workout has been generated below.", embed=None, components=None, hidden=True)
-                    await self.workout.invoke(button_ctx)
-                    return
 
     @cog_ext.cog_slash(name="bmi",
                        description="BMI calculator.",
