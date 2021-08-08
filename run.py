@@ -22,9 +22,7 @@ dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 bot.run(os.environ.get("TOKEN"))
 
-# TO DO:
-# Fix no commands on fitbot initially joining server
-# Discord Buttons & Dropdowns - Improve flow of bot
+# TODO:
 # Weekly Calorie Tracker - Tracks last 7 days of calorie inputs, with 7-day average
 # EOD Summary - Total calories and water that day
 # Leaderboard - Sub-leaderboards (sub-commands) could include Running, Steps, Cycling, Swimming, Calories Burnt

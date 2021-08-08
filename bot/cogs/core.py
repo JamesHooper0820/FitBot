@@ -54,9 +54,15 @@ class Core(commands.Cog):
             name="FitBot",
             icon_url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
 
-        # BUG: Could be a problem if bot doesn't have perms to that channel index 0
-        channel = guild.text_channels[0]
-        await channel.send(embed=embed)
+        channels = guild.text_channels
+        for i, channel in enumerate(channels):
+            if i == len(channels):
+                return
+            if (guild.me.permissions_in(channel).send_messages is False and
+               guild.me.permissions_in(channel).embed_links is False):
+                continue
+            else:
+                await channel.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild) -> None:
