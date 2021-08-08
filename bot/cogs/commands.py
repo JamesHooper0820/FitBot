@@ -8,6 +8,7 @@ from discord_slash import cog_ext
 from discord_slash.utils.manage_components import *
 from discord_slash.model import ButtonStyle
 from .core import Core
+from oauth2.models import CalorieLogEntry
 
 
 class Commands(commands.Cog):
@@ -17,6 +18,46 @@ class Commands(commands.Cog):
         """Initialize the bot."""
         self.bot = bot
         self.core = Core(bot)
+
+    @cog_ext.cog_slash(name="log",
+                       description="Log command.",
+                       guild_ids=[799768142045249606, 873664168685883422])
+    async def log(self, ctx) -> None:
+        await self.send_dm(ctx, ctx.author, content="Please note, the following information is **not** saved by FitBot.")
+        
+        self.log = False
+
+        self.log = await self.log_listener(ctx)
+        while (self.log == False):
+            await self.log_listener(ctx)
+    
+    @commands.Cog.listener()
+    async def log_listener(self, ctx) -> bool:
+        await ctx.send(ctx.author.mention + " Please visit your DM's to enter the information safely and securely.", hidden=True)
+        await self.send_dm(ctx, ctx.author, content="Please input the number of calories you've consumed today:")
+
+        def check_calories(msg) -> bool:
+            value = msg.content
+            try:
+                return msg.author == ctx.author and isinstance(
+                    msg.channel, discord.channel.DMChannel) and isinstance(
+                    int(value), int)
+            except ValueError:
+                return False
+
+        try:
+            self.calorie_msg = await self.bot.wait_for("message", check=check_calories, timeout=30)
+            await self.send_dm(ctx, ctx.author, content=f"Value inputted: `{self.calorie_msg.content}` calories.")
+
+            CalorieLogEntry.objects.create(calories=self.calorie_msg.content, user=self.calorie_msg.author)
+        except asyncio.TimeoutError:
+            await self.send_dm(ctx, ctx.author, content="Sorry, you didn't respond in time! Please input the number of calories consumed today: ")
+            self.log = False
+            return self.log
+        else:
+            await self.calorie_msg.add_reaction("👍")
+            self.log = True
+            return self.log
 
     @cog_ext.cog_slash(name="help",
                        description="Help command.",
@@ -282,7 +323,7 @@ class Commands(commands.Cog):
         await self.send_dm(ctx, ctx.author, content="Don't worry if it's not what you want it to be, **you** can make the difference!")
 
     @commands.Cog.listener()
-    async def height_listener(self, ctx) -> int:
+    async def height_listener(self, ctx) -> bool:
         await self.send_dm(ctx, ctx.author, content="Please enter your height in `cm`:")
 
         def check_height(msg) -> bool:
@@ -307,7 +348,7 @@ class Commands(commands.Cog):
             return self.height
 
     @commands.Cog.listener()
-    async def weight_listener(self, ctx) -> int:
+    async def weight_listener(self, ctx) -> bool:
         await self.send_dm(ctx, ctx.author, content="Please enter your weight in `kg`:")
 
         def check_weight(msg) -> bool:
@@ -332,7 +373,7 @@ class Commands(commands.Cog):
             return self.weight
 
     @commands.Cog.listener()
-    async def age_listener(self, ctx) -> int:
+    async def age_listener(self, ctx) -> bool:
         await self.send_dm(ctx, ctx.author, content="Please enter your age:")
 
         def check_age(msg) -> bool:
@@ -357,7 +398,7 @@ class Commands(commands.Cog):
             return self.age
 
     @commands.Cog.listener()
-    async def gender_listener(self, ctx) -> str:
+    async def gender_listener(self, ctx) -> bool:
         await self.send_dm(ctx, ctx.author, content="Please enter your gender, type `m` for `male`, and `f` for `female`:")
 
         def check_gender(msg) -> bool:
@@ -389,7 +430,7 @@ class Commands(commands.Cog):
             return self.gender
 
     @commands.Cog.listener()
-    async def activity_listener(self, ctx) -> str:
+    async def activity_listener(self, ctx) -> bool:
         await self.send_dm(ctx, ctx.author, content="Please enter your activity level, type:\n"
                            "`1` for Sedentary: little or no exercise\n"
                            "`2` for Light: exercise 1-3 times/week\n"
