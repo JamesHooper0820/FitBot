@@ -49,6 +49,7 @@ class Commands(commands.Cog):
             self.calorie_msg = await self.bot.wait_for("message", check=check_calories, timeout=30)
             await self.send_dm(ctx, ctx.author, content=f"Value inputted: `{self.calorie_msg.content}` calories.")
 
+            # BUG
             CalorieLogEntry.objects.create(calories=self.calorie_msg.content, user=self.calorie_msg.author)
         except asyncio.TimeoutError:
             await self.send_dm(ctx, ctx.author, content="Sorry, you didn't respond in time! Please input the number of calories consumed today: ")
