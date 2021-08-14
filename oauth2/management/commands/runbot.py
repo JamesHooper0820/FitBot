@@ -1,7 +1,7 @@
 import discord
 from discord.ext.commands import Bot
 from bot.cogs.core import Core
-from bot.cogs.role_command import RoleCommands
+from bot.cogs.role_commands import RoleCommands
 from bot.cogs.background import Background
 from bot.cogs.commands import Commands
 import os

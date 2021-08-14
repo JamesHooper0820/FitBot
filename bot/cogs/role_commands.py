@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext
-from discord_slash.model import SlashCommandPermissionType
-from discord_slash.utils.manage_commands import create_permission
+
 
 class RoleCommands(commands.Cog):
     """Initialize the Role Commands cog."""
@@ -27,11 +26,7 @@ class RoleCommands(commands.Cog):
 
     @cog_ext.cog_slash(name="rolesettings",
                        description="Role settings.",
-                       guild_ids=[799768142045249606, 873664168685883422],
-                       #permissions={
-                       # [
-                       #     create_permission(self.role.id, SlashCommandPermissionType.ROLE, True),]}
-                        )
+                       guild_ids=[799768142045249606, 873664168685883422],)
     @user_has_roles
     async def role_settings(self, ctx):
         embed = discord.Embed(
@@ -43,10 +38,5 @@ class RoleCommands(commands.Cog):
         embed.set_author(
             name="FitBot",
             icon_url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
-        embed.add_field(
-            name="Exercises:",
-            value="For exercises that require weights, please use whatever you are comfortable with.",
-            inline=False)
-        embed.add_field(name="\u200b", value="\u200b")
 
         await ctx.send(embed=embed, hidden=True)
