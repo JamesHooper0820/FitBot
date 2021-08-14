@@ -108,14 +108,14 @@ class Core(commands.Cog):
         buttons = [
             create_button(
                 style=ButtonStyle.green,
-                label="Posture Checker",
-                custom_id="Posture Checker",
+                label="Posture Check",
+                custom_id="Posture Check",
                 emoji="🧍"
             ),
             create_button(
                 style=ButtonStyle.green,
-                label="Hydration Checker",
-                custom_id="Hydration Checker",
+                label="Hydration Check",
+                custom_id="Hydration Check",
                 emoji="🚰"
             ),
             create_button(
@@ -138,32 +138,31 @@ class Core(commands.Cog):
             self.posture_role = discord.utils.get(button_ctx.guild.roles, name="Posture Check")
             self.hydration_role = discord.utils.get(button_ctx.guild.roles, name="Hydration Check")
 
-            if button_ctx.custom_id == "Posture Checker":
+            if button_ctx.custom_id == "Posture Check":
                 if self.posture_role is not None:
                     if self.posture_role in self.member.roles:
                         await button_ctx.defer(hidden=True)
                         await self.member.remove_roles(self.posture_role)
-                        await button_ctx.send(button_ctx.author.mention + " `Posture Checker` role successfully **removed**.", hidden=True)
+                        await button_ctx.send(button_ctx.author.mention + " `Posture Check` role successfully **removed**.", hidden=True)
                     else:
                         try:
                             await button_ctx.defer(hidden=True)
                             await self.member.add_roles(self.posture_role)
-                            await button_ctx.send(button_ctx.author.mention + " `Posture Checker` role successfully **added**.", hidden=True)
+                            await button_ctx.send(button_ctx.author.mention + " `Posture Check` role successfully **added**.", hidden=True)
                         except HTTPException:
                             pass
 
-            elif button_ctx.custom_id == "Hydration Checker":
-                self.posture_role = discord.utils.get(button_ctx.guild.roles, name="Posture Check")
+            elif button_ctx.custom_id == "Hydration Check":
                 if self.hydration_role is not None:
                     if self.hydration_role in self.member.roles:
                         await button_ctx.defer(hidden=True)
                         await self.member.remove_roles(self.hydration_role)
-                        await button_ctx.send(button_ctx.author.mention + " `Hydration Checker` role successfully **removed**.", hidden=True)
+                        await button_ctx.send(button_ctx.author.mention + " `Hydration Check` role successfully **removed**.", hidden=True)
                     else:
                         try:
                             await button_ctx.defer(hidden=True)
                             await self.member.add_roles(self.hydration_role)
-                            await button_ctx.send(button_ctx.author.mention + " `Hydration Checker` role successfully **added**.", hidden=True)
+                            await button_ctx.send(button_ctx.author.mention + " `Hydration Check` role successfully **added**.", hidden=True)
                         except HTTPException:
                             pass
 

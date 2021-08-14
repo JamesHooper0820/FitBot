@@ -12,11 +12,11 @@ class Background(commands.Cog):
 
     @loop(hours=1)
     async def posture(self) -> None:
-        for self.guild in self.bot.guilds:
+        for guild in self.bot.guilds:
             role = discord.utils.find(
                 lambda r: r.name == 'Posture Check',
-                self.guild.roles)
-            members = [m for m in self.guild.members if role in m.roles]
+                guild.roles)
+            members = [m for m in guild.members if role in m.roles]
             for m in members:
                 try:
                     await m.send((m.mention + " Hourly posture check, fix your posture!"))
@@ -25,11 +25,11 @@ class Background(commands.Cog):
 
     @loop(hours=1)
     async def hydration(self) -> None:
-        for self.guild in self.bot.guilds:
+        for guild in self.bot.guilds:
             role = discord.utils.find(
                 lambda r: r.name == 'Hydration Check',
-                self.guild.roles)
-            members = [m for m in self.guild.members if role in m.roles]
+                guild.roles)
+            members = [m for m in guild.members if role in m.roles]
             for m in members:
                 try:
                     await m.send((m.mention + " Hourly hydration check, drink some water!"))

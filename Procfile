@@ -1,1 +1,1 @@
-worker: python run.py
+worker: python oauth2/management/commands/runbot.py
