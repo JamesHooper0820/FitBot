@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 from discord_slash import cog_ext
+from discord_slash.model import SlashCommandPermissionType
+from discord_slash.utils.manage_commands import create_permission, generate_permissions
 
 
 class RoleCommands(commands.Cog):
@@ -12,22 +14,24 @@ class RoleCommands(commands.Cog):
         self.posture_hours = 1
         self.hydration_hours = 1
 
-        self.posture_role = discord.utils.find(
+    async def role_settings_helper(self, ctx):
+        posture_role = discord.utils.find(
                 lambda r: r.name == 'Posture Check',
-                self.bot.guild.roles)
-        self.hydration_role = discord.utils.find(
+                ctx.guild.roles)
+        hydration_role = discord.utils.find(
                 lambda r: r.name == 'Hydration Check',
-                self.bot.guild.roles)
+                ctx.guild.roles)
 
-    def has_role(self, ctx):
-        return (self.posture_role in ctx.author.roles) or (self.hydration_role in ctx.author.roles)
-    
-    user_has_roles = commands.check(has_role)
+        posture_id = posture_role.id
+        hydration_id = hydration_role.id
+
+        return [posture_id, hydration_id]
 
     @cog_ext.cog_slash(name="rolesettings",
                        description="Role settings.",
-                       guild_ids=[799768142045249606, 873664168685883422],)
-    @user_has_roles
+                       guild_ids=[799768142045249606, 873664168685883422],
+                       default_permission = False)
+    @cog_ext.permission(generate_permissions(ctx.guild.id, allowed_roles=role_settings_helper()))
     async def role_settings(self, ctx):
         embed = discord.Embed(
             title="Role Settings",

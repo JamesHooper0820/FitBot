@@ -25,7 +25,7 @@ class Command(BaseCommand):
 
         dotenv_path = join(dirname(__file__), '.env')
         load_dotenv(dotenv_path)
-        bot.run(os.environ.get("TOKEN"))
+        bot.run(os.environ.get('TOKEN'))
 
 # TODO:
 # Exclusive command for those with posture/hydration check role to edit frequency of pings
