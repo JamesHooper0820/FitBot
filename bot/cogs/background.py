@@ -19,7 +19,7 @@ class Background(commands.Cog):
             members = [m for m in guild.members if role in m.roles]
             for m in members:
                 try:
-                    await m.send((m.mention + " Hourly posture check, fix your posture!"))
+                    await m.send((m.mention + " Check your posture!"))
                 except discord.Forbidden:
                     pass
 
@@ -32,6 +32,6 @@ class Background(commands.Cog):
             members = [m for m in guild.members if role in m.roles]
             for m in members:
                 try:
-                    await m.send((m.mention + " Hourly hydration check, drink some water!"))
+                    await m.send((m.mention + " Drink some water!"))
                 except discord.Forbidden:
                     pass

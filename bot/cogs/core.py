@@ -120,8 +120,8 @@ class Core(commands.Cog):
             ),
             create_button(
                 style=ButtonStyle.red,
-                label="Reset FitBot Roles",
-                custom_id="Reset FitBot Roles"
+                label="Remove FitBot Roles",
+                custom_id="Remove FitBot Roles"
             ),
         ]
         action_row = create_actionrow(*buttons)
@@ -145,12 +145,10 @@ class Core(commands.Cog):
                         await self.member.remove_roles(self.posture_role)
                         await button_ctx.send(button_ctx.author.mention + " `Posture Check` role successfully **removed**.", hidden=True)
                     else:
-                        try:
-                            await button_ctx.defer(hidden=True)
-                            await self.member.add_roles(self.posture_role)
-                            await button_ctx.send(button_ctx.author.mention + " `Posture Check` role successfully **added**.", hidden=True)
-                        except HTTPException:
-                            pass
+                        await button_ctx.defer(hidden=True)
+                        await self.member.add_roles(self.posture_role)
+                        await button_ctx.send(button_ctx.author.mention + " `Posture Check` role successfully **added**.", hidden=True)
+
 
             elif button_ctx.custom_id == "Hydration Check":
                 if self.hydration_role is not None:
@@ -159,16 +157,10 @@ class Core(commands.Cog):
                         await self.member.remove_roles(self.hydration_role)
                         await button_ctx.send(button_ctx.author.mention + " `Hydration Check` role successfully **removed**.", hidden=True)
                     else:
-                        try:
-                            await button_ctx.defer(hidden=True)
-                            await self.member.add_roles(self.hydration_role)
-                            await button_ctx.send(button_ctx.author.mention + " `Hydration Check` role successfully **added**.", hidden=True)
-                        except HTTPException:
-                            pass
+                        await button_ctx.defer(hidden=True)
+                        await self.member.add_roles(self.hydration_role)
+                        await button_ctx.send(button_ctx.author.mention + " `Hydration Check` role successfully **added**.", hidden=True)
 
-            elif button_ctx.custom_id == "Reset FitBot Roles":
-                try:
-                    await self.member.remove_roles(self.posture_role, self.hydration_role)
-                    await button_ctx.send(button_ctx.author.mention + " Sucessfully **removed** all FitBot roles.", hidden=True)
-                except HTTPException:
-                    pass
+            elif button_ctx.custom_id == "Remove FitBot Roles":
+                await self.member.remove_roles(self.posture_role, self.hydration_role)
+                await button_ctx.send(button_ctx.author.mention + " Sucessfully **removed** all FitBot roles.", hidden=True)
