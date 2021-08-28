@@ -112,7 +112,7 @@ class RoleCommands(commands.Cog):
                             if button_ctx.custom_id == "Remove Posture Check Role":
                                 await self.member.remove_roles(self.posture_role)
                                 await button_ctx.send(button_ctx.author.mention + " Sucessfully **removed** the `Posture Check` role.", hidden=True)
-                            # TODO
+                            # TODO - Allow user to select 30mins, 1hr or 2hrs role
                             elif button_ctx.custom_id == "Change 'Check' Frequency":
                                 pass
                     else:
@@ -148,7 +148,7 @@ class RoleCommands(commands.Cog):
                             if button_ctx.custom_id == "Remove Hydration Check Role":
                                 await self.member.remove_roles(self.hydration_role)
                                 await button_ctx.send(button_ctx.author.mention + " Sucessfully **removed** the `Hydration Check` role.", hidden=True)
-                            # TODO
+                            # TODO - Allow user to select 30mins, 1hr or 2hrs role
                             elif button_ctx.custom_id == "Change 'Check' Frequency":
                                 pass
                     else:

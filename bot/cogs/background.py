@@ -22,6 +22,25 @@ class Background(commands.Cog):
                     await m.send((m.mention + " Check your posture!"))
                 except discord.Forbidden:
                     pass
+    # TODO
+    @loop(hours=1)
+    async def posture(self) -> None:
+        for guild in self.bot.guilds:
+            role_30minutes = discord.utils.find(
+                lambda r: r.name == 'PLACEHOLDER',
+                guild.roles)
+            role_1hour = discord.utils.find(
+                lambda r: r.name == 'PLACEHOLDER',
+                guild.roles)
+            role_2hours = discord.utils.find(
+                lambda r: r.name == 'PLACEHOLDER',
+                guild.roles)
+            members_30minutes = [m for m in guild.members if role_30minutes in m.roles]
+            members_1hour = [m for m in guild.members if role_1hour in m.roles]
+            members_2hours = [m for m in guild.members if role_2hours in m.roles]
+
+            current_iteration = self.posture.current_loop
+            
 
     @loop(hours=1)
     async def hydration(self) -> None:

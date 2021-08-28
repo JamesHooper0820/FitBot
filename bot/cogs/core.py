@@ -1,5 +1,4 @@
 import discord
-from discord.errors import HTTPException
 from discord.ext import commands
 from discord.ext.tasks import loop
 from .background import Background
