@@ -39,7 +39,7 @@ class RoleCommands(commands.Cog):
             else:
                 await ctx.send(ctx.author.mention + " You do not have any roles yet.", hidden=True)
                 return False 
-        # BUG: Have it pass on a CheckFailure error
+
         return commands.check(predicate)
 
     @cog_ext.cog_slash(name="rolesettings",
