@@ -83,8 +83,8 @@ class Core(commands.Cog):
                        description="Initializes FitBot.",
                        guild_ids=[799768142045249606, 873664168685883422])
     async def initialize(self, ctx) -> None:
-        await ctx.guild.create_role(name="Posture Check", mentionable=True, colour=discord.Colour(0x34e12f))
-        await ctx.guild.create_role(name="Hydration Check", mentionable=True, colour=discord.Colour(0x45c7ea))
+        await ctx.guild.create_role(name="Posture Check - 30mins", mentionable=True, colour=discord.Colour(0x34e12f))
+        await ctx.guild.create_role(name="Hydration Check - 30mins", mentionable=True, colour=discord.Colour(0x45c7ea))
 
         embed = discord.Embed(
             title="Introducing FitBot!",
@@ -97,7 +97,7 @@ class Core(commands.Cog):
             icon_url="https://e7.pngegg.com/pngimages/416/261/png-clipart-8-bit-color-8bit-heart-pixel-art-color-depth-allanon-heart-video-game.png")
         embed.add_field(
             name="Roles",
-            value="Click on the buttons below to access FitBot's roles.",
+            value="Click on the buttons below to access FitBot's roles. The default 'check' frequency is 30 minutes, this can be changed using `/rolesettings`.",
             inline=False)
         embed.add_field(
             name="Help",
@@ -134,17 +134,15 @@ class Core(commands.Cog):
             button_ctx: ComponentContext = await wait_for_component(self.bot, check=check_ctx, components=[action_row])
 
             self.member = await button_ctx.guild.fetch_member(button_ctx.author_id)
-            self.posture_role = discord.utils.get(button_ctx.guild.roles, name="Posture Check")
-            self.hydration_role = discord.utils.get(button_ctx.guild.roles, name="Hydration Check")
+            self.posture_role = discord.utils.get(button_ctx.guild.roles, name="Posture Check - 30mins")
+            self.hydration_role = discord.utils.get(button_ctx.guild.roles, name="Hydration Check - 30mins")
 
             if button_ctx.custom_id == "Posture Check":
                 if self.posture_role is not None:
                     if self.posture_role in self.member.roles:
-                        await button_ctx.defer(hidden=True)
                         await self.member.remove_roles(self.posture_role)
                         await button_ctx.send(button_ctx.author.mention + " `Posture Check` role successfully **removed**.", hidden=True)
                     else:
-                        await button_ctx.defer(hidden=True)
                         await self.member.add_roles(self.posture_role)
                         await button_ctx.send(button_ctx.author.mention + " `Posture Check` role successfully **added**.", hidden=True)
 
@@ -152,11 +150,9 @@ class Core(commands.Cog):
             elif button_ctx.custom_id == "Hydration Check":
                 if self.hydration_role is not None:
                     if self.hydration_role in self.member.roles:
-                        await button_ctx.defer(hidden=True)
                         await self.member.remove_roles(self.hydration_role)
                         await button_ctx.send(button_ctx.author.mention + " `Hydration Check` role successfully **removed**.", hidden=True)
                     else:
-                        await button_ctx.defer(hidden=True)
                         await self.member.add_roles(self.hydration_role)
                         await button_ctx.send(button_ctx.author.mention + " `Hydration Check` role successfully **added**.", hidden=True)
 

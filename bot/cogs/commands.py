@@ -8,6 +8,7 @@ from discord_slash import cog_ext
 from discord_slash.utils.manage_components import *
 from discord_slash.model import ButtonStyle
 from .core import Core
+from .role_commands import RoleCommands
 from oauth2.models import CalorieLogEntry
 
 
@@ -18,6 +19,7 @@ class Commands(commands.Cog):
         """Initialize the bot."""
         self.bot = bot
         self.core = Core(bot)
+        self.role_commands = RoleCommands(bot)
 
     @cog_ext.cog_slash(name="log",
                        description="Log command.",
@@ -85,6 +87,10 @@ class Commands(commands.Cog):
                     value="calories",
                     description="Calorie calculator"),
                 create_select_option(
+                    "/rolesettings",
+                    value="rolesettings",
+                    description="Role settings"),
+                create_select_option(
                     "/help", value="help", description="Help command"),
             ],
             placeholder="Select...",
@@ -115,6 +121,8 @@ class Commands(commands.Cog):
                     await self.calorie_calculator.invoke(select_ctx)
                 elif select_ctx.selected_options[0] == "help":
                     await self.help.invoke(select_ctx)
+                elif select_ctx.selected_options[0] == "rolesettings":
+                    await self.role_commands.role_settings.invoke(select_ctx)
 
     async def send_dm(self, ctx, member: discord.Member, *, content):
         channel = await member.create_dm()

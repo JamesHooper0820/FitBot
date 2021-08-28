@@ -28,7 +28,6 @@ class Command(BaseCommand):
         bot.run(os.environ.get('TOKEN'))
 
 # TODO:
-# Exclusive command for those with posture/hydration check role to edit frequency of pings
 # Weekly Calorie Tracker - Tracks last 7 days of calorie inputs, with 7-day average, subcommand /log into calorie tracker, water tracker etc
 # EOD Summary - Total calories and water that day
 # Leaderboard - Sub-leaderboards (sub-commands) could include Running, Steps, Cycling, Swimming, Calories Burnt, leaderboards for across all servers and current servers
