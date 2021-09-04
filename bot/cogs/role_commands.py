@@ -161,27 +161,27 @@ class RoleCommands(commands.Cog):
                                     if button_ctx.custom_id == "Posture Check - 30mins":
                                         if self.posture_role_30mins is not None:
                                             if self.posture_role_30mins in self.member.roles:
-                                                await self.member.remove_roles(self.posture_role_30mins)
-                                                await button_ctx.send(button_ctx.author.mention + " `Posture Check - 30mins` role successfully **removed**.", hidden=True)
+                                                await button_ctx.send(button_ctx.author.mention + " You already have the `Posture Check - 30mins` role selected.", hidden=True)
                                             else:
+                                                await self.member.remove_roles(*self.all_posture_roles)
                                                 await self.member.add_roles(self.posture_role_30mins)
                                                 await button_ctx.send(button_ctx.author.mention + " `Posture Check - 30mins` role successfully **added**.", hidden=True)
 
                                     if button_ctx.custom_id == "Posture Check - 1hr":
                                         if self.posture_role_1hr is not None:
                                             if self.posture_role_1hr in self.member.roles:
-                                                await self.member.remove_roles(self.posture_role_1hr)
-                                                await button_ctx.send(button_ctx.author.mention + " `Posture Check - 1hr` role successfully **removed**.", hidden=True)
+                                                await button_ctx.send(button_ctx.author.mention + " You already have the `Posture Check - 1hr` role selected.", hidden=True)
                                             else:
+                                                await self.member.remove_roles(*self.all_posture_roles)
                                                 await self.member.add_roles(self.posture_role_1hr)
                                                 await button_ctx.send(button_ctx.author.mention + " `Posture Check - 1hr` role successfully **added**.", hidden=True)
 
                                     if button_ctx.custom_id == "Posture Check - 2hrs":
                                         if self.posture_role_2hrs is not None:
                                             if self.posture_role_2hrs in self.member.roles:
-                                                await self.member.remove_roles(self.posture_role_2hrs)
-                                                await button_ctx.send(button_ctx.author.mention + " `Posture Check - 2hrs` role successfully **removed**.", hidden=True)
+                                                await button_ctx.send(button_ctx.author.mention + " You already have the `Posture Check - 2hrs` role selected.", hidden=True)
                                             else:
+                                                await self.member.remove_roles(*self.all_posture_roles)
                                                 await self.member.add_roles(self.posture_role_2hrs)
                                                 await button_ctx.send(button_ctx.author.mention + " `Posture Check - 2hrs` role successfully **added**.", hidden=True)
                     else:
@@ -249,27 +249,27 @@ class RoleCommands(commands.Cog):
                                     if button_ctx.custom_id == "Hydration Check - 30mins":
                                         if self.hydration_role_30mins is not None:
                                             if self.hydration_role_30mins in self.member.roles:
-                                                await self.member.remove_roles(self.hydration_role_30mins)
-                                                await button_ctx.send(button_ctx.author.mention + " `Hydration Check - 30mins` role successfully **removed**.", hidden=True)
+                                                await button_ctx.send(button_ctx.author.mention + " You already have the `Hydration Check - 30mins` role selected.", hidden=True)
                                             else:
+                                                await self.member.remove_roles(*self.all_posture_roles)
                                                 await self.member.add_roles(self.hydration_role_30mins)
                                                 await button_ctx.send(button_ctx.author.mention + " `Hydration Check - 30mins` role successfully **added**.", hidden=True)
 
                                     if button_ctx.custom_id == "Hydration Check - 1hr":
                                         if self.hydration_role_1hr is not None:
                                             if self.hydration_role_1hr in self.member.roles:
-                                                await self.member.remove_roles(self.hydration_role_1hr)
-                                                await button_ctx.send(button_ctx.author.mention + " `Hydration Check - 1hr` role successfully **removed**.", hidden=True)
+                                                await button_ctx.send(button_ctx.author.mention + " You already have the `Hydration Check - 1hr` role selected.", hidden=True)
                                             else:
+                                                await self.member.remove_roles(*self.all_posture_roles)
                                                 await self.member.add_roles(self.hydration_role_1hr)
                                                 await button_ctx.send(button_ctx.author.mention + " `Hydration Check - 1hr` role successfully **added**.", hidden=True)
 
                                     if button_ctx.custom_id == "Hydration Check - 2hrs":
                                         if self.hydration_role_2hrs is not None:
                                             if self.hydration_role_2hrs in self.member.roles:
-                                                await self.member.remove_roles(self.hydration_role_2hrs)
-                                                await button_ctx.send(button_ctx.author.mention + " `Hydration Check - 2hrs` role successfully **removed**.", hidden=True)
+                                                await button_ctx.send(button_ctx.author.mention + " You already have the `Hydration Check - 2hrs` role selected.", hidden=True)
                                             else:
+                                                await self.member.remove_roles(*self.all_posture_roles)
                                                 await self.member.add_roles(self.hydration_role_2hrs)
                                                 await button_ctx.send(button_ctx.author.mention + " `Hydration Check - 2hrs` role successfully **added**.", hidden=True)
                     else:
